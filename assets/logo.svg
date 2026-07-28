@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 160" width="560" height="160">
+  <defs>
+    <linearGradient id="vsArrow" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#5b46e5"/>
+      <stop offset="100%" stop-color="#8a7bff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- icon: precessing magnetic moment -->
+  <g transform="translate(80,80)">
+    <!-- B0 axis -->
+    <line x1="0" y1="-62" x2="0" y2="62" stroke="#9aa0b4" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
+    <text x="10" y="-48" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="20" fill="#9aa0b4">B0</text>
+
+    <!-- precession cone (ellipse) -->
+    <ellipse cx="0" cy="18" rx="54" ry="16" fill="none" stroke="#f0a83c" stroke-width="3"/>
+
+    <!-- precession-motion arc arrow along the cone -->
+    <path d="M -40 8 A 54 16 0 0 1 30 24" fill="none" stroke="#f0a83c" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 30 24 l -9 -5 M 30 24 l -3 -10" fill="none" stroke="#f0a83c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- magnetic moment vector -->
+    <line x1="0" y1="0" x2="46" y2="-46" stroke="url(#vsArrow)" stroke-width="7" stroke-linecap="round"/>
+    <path d="M 46 -46 l -18 3 M 46 -46 l -3 18" fill="none" stroke="url(#vsArrow)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- origin -->
+    <circle cx="0" cy="0" r="4.5" fill="#2a2f45"/>
+  </g>
+
+  <!-- wordmark -->
+  <g transform="translate(168,0)" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="54">
+    <text x="0" y="98" fill="#2a2f45">Visu<tspan fill="#5b46e5">Spin</tspan></text>
+  </g>
+</svg>
