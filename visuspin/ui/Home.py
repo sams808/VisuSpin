@@ -3,7 +3,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import streamlit as st
-from common import render_logo, ACCENT
+from common import render_logo, lesson_link
 
 st.set_page_config(page_title="VisuSpin", page_icon="🧲", layout="wide")
 
@@ -13,40 +13,34 @@ st.divider()
 
 st.markdown(
     """
-VisuSpin is a set of interactive, physically-grounded simulations for
-teaching solid-state (and general) NMR spin dynamics. Every plot on every
-page is generated from the actual underlying spin physics — Bloch-equation
+VisuSpin is a guided path through solid-state NMR spin physics, built for
+students with **no prior NMR background**. Every plot on every page is
+computed live from the actual underlying physics — Bloch-equation
 integration, exact spin-operator diagonalization, or direct numerical powder
-simulation — computed live from the parameters you choose, not from
-pre-rendered pictures.
+simulation — from the parameters you choose, not from pre-rendered pictures.
 
-**Use the page list in the left sidebar to jump between modules:**
+Each lesson opens with a concrete question, builds the idea up one step at a
+time, and asks you to predict what a plot will show *before* revealing it —
+then hands you the full explorer to play with once the concept has landed.
+Go in order the first time through; after that, jump to any lesson from the
+sidebar as a reference.
 """
 )
+st.divider()
 
-cols = st.columns(2)
-with cols[0]:
-    st.markdown(
-        f"""
-##### Relaxation & pulses
-- **Relaxation Explorer** — T1/T2/T2\\* Bloch simulation, real nuclide table, finite pulses, CT-selective & DFS excitation, MAS sidebands
-- **Nutation & CT-Selectivity** — quadrupolar nutation curves, (I+1/2) enhancement, DFS adiabatic sweeps
+st.subheader("The path")
 
-##### Lineshapes
-- **Lineshapes** — CSA, dipolar Pake pattern, 1st/2nd-order quadrupolar CT, MAS sidebands
-- **Powder Averaging (3D)** — see which crystallite orientations build which part of a powder pattern
-- **MQMAS** — why correlating a multiple-quantum dimension removes 2nd-order quadrupolar broadening
-""")
-with cols[1]:
-    st.markdown(
-        f"""
-##### Correlations & coupling
-- **HMQC** — 2D heteronuclear correlation via J- or D-mediated coherence transfer
-- **Multiplets & Decoupling** — J-multiplets collapsing under heteronuclear decoupling
-
-##### Pulse sequences
-- **Pulse Sequence Composer** — build sequences (Hahn echo, CPMG, REDOR, CP, spin-lock, DFS, ...) block by block, Scratch-style, with live timing diagrams and simulated signal traces
-""")
+lesson_link("0", "NMR Fundamentals", "Magnetization, precession, RF pulses, T1/T2, the FID, and the Fourier transform.", "pages/0_NMR_Fundamentals.py")
+lesson_link("1", "Relaxation Explorer", "Why the same sample decays two different ways — T2 vs. T2*, and how an echo tells them apart.", "pages/1_Relaxation_Explorer.py")
+lesson_link("2", "Chemical Shift Anisotropy", "Why a solid powder turns one sharp solution-NMR peak into a broad hump.", "pages/2_Chemical_Shift_Anisotropy.py")
+lesson_link("3", "Dipolar Coupling", "Two nearby nuclei as tiny bar magnets — the Pake doublet, and a distance ruler that scales as 1/r³.", "pages/3_Dipolar_Coupling.py")
+lesson_link("4", "Quadrupolar Interactions", "Why 23Na, 27Al, 11B and friends look so different from 1H — and why higher field narrows their lines.", "pages/4_Quadrupolar_Interactions.py")
+lesson_link("5", "Magic-Angle Spinning", "One trick, spinning at 54.74°, that erases CSA, dipolar, and first-order quadrupolar broadening at once.", "pages/5_Magic_Angle_Spinning.py")
+lesson_link("6", "MQMAS", "The 2D trick that finishes the job MAS alone can't: removing residual quadrupolar broadening.", "pages/6_MQMAS.py")
+lesson_link("7", "Nutation & CT-Selectivity", "Exciting quadrupolar nuclei efficiently, and boosting signal further with DFS.", "pages/7_Nutation_CT_Selectivity.py")
+lesson_link("8", "J-Coupling & Decoupling", "The one coupling that doesn't care about orientation — and how to switch it off on purpose.", "pages/8_J_Coupling_Decoupling.py")
+lesson_link("9", "HMQC", "Turning 'these nuclei are coupled' into a 2D map of exactly which atoms are linked to which.", "pages/9_HMQC.py")
+lesson_link("10", "Pulse Sequence Composer", "Capstone: build Hahn echo, CPMG, REDOR, CP and more from the same handful of primitives.", "pages/10_Pulse_Sequence_Composer.py")
 
 st.divider()
 st.markdown(

@@ -21,6 +21,14 @@ def dipolar_coupling_hz(gamma_i: float, gamma_s: float, r_angstrom: float) -> fl
     return d_rad_s / (2 * np.pi)
 
 
+def dipolar_splitting_hz(cos_theta: np.ndarray, d_hz: float) -> np.ndarray:
+    """Per-orientation dipolar splitting +D*(3cos^2(theta)-1)/2 (the standard
+    secular heteronuclear dipolar term), vectorized over cos_theta so it can
+    drive both the Pake-pattern histogram below and a 3D powder-averaging
+    visualization (visuspin.physics.powder.powder_visualization_data)."""
+    return d_hz * (3 * cos_theta ** 2 - 1) / 2
+
+
 def pake_pattern(d_hz: float, n_samples: int = 20000, n_bins: int = 400) -> dict:
     """Powder-averaged dipolar splitting: each crystallite gives a doublet at
     +/- D*(3cos^2(theta)-1)/2 (the standard heteronuclear dipolar Hamiltonian
@@ -29,7 +37,7 @@ def pake_pattern(d_hz: float, n_samples: int = 20000, n_bins: int = 400) -> dict
     (theta=0 deg)."""
     rng = np.random.default_rng(21)
     cos_t = rng.uniform(-1, 1, n_samples)
-    split = d_hz * (3 * cos_t ** 2 - 1) / 2
+    split = dipolar_splitting_hz(cos_t, d_hz)
     freqs = np.concatenate([split, -split])
     max_f = d_hz * 1.15
     counts, edges = np.histogram(freqs, bins=n_bins, range=(-max_f, max_f))

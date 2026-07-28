@@ -5,14 +5,38 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import matplotlib.pyplot as plt
 import streamlit as st
 
-from common import page_header
+from common import page_header, lesson_header, key_takeaway
 from visuspin.sequences.blocks import SequenceContext, Pulse, Delay, Loop, SpinLock, Acquire, Recouple, CrossPolarize, DFSSweep
 from visuspin.sequences.presets import PRESETS
 from visuspin.sequences.engine import run_sequence
 from visuspin.sequences.diagram import render_sequence_diagram
 
 st.set_page_config(page_title="VisuSpin — Pulse Sequence Composer", page_icon="🧩", layout="wide")
-page_header("Pulse Sequence Composer", "Build a pulse sequence block by block, Scratch-style, and see its timing diagram and simulated signal")
+page_header("Lesson 10: Pulse Sequence Composer")
+lesson_header(
+    "Lesson 10 of 11 — capstone",
+    "Real experiments (Hahn echo, CPMG, REDOR, CP...) — how are they actually built?",
+    "Every previous lesson used one purpose-built simulation. But a real spectrometer only "
+    "knows how to do a handful of primitive things: pulse, wait, repeat, lock, acquire. How "
+    "do all those named techniques come out of just those primitives?",
+)
+
+st.markdown(
+    """
+Every sequence in this composer — including every named technique you've
+already met (the Hahn echo from Lesson 1, REDOR/CP/spin-lock built into the
+presets below) — is nothing more than an ordered list of a handful of
+building blocks, run on the exact same isochromat physics from Lesson 0:
+**Pulse** (tip M by some angle), **Delay** (let it evolve/relax), **Loop**
+(repeat a block of steps, e.g. an echo train), **SpinLock** (hold M with
+continuous RF), **Acquire** (mark where the signal is recorded), plus two
+solid-state specialties from Lessons 3-7: **Recouple** (reintroduce dipolar
+coupling under MAS, for REDOR) and **CrossPolarize** and **DFSSweep**.
+
+Load a preset below, then add, remove, or edit blocks freely — the timing
+diagram and simulated signal update to match whatever you build.
+"""
+)
 
 BLOCK_CLASSES = {cls.name: cls for cls in [Pulse, Delay, Loop, SpinLock, Acquire, Recouple, CrossPolarize, DFSSweep]}
 
@@ -111,8 +135,30 @@ if st.session_state.vs_sequence:
 else:
     st.info("Add at least one block to build a sequence.")
 
-st.caption(
-    "Every named technique (Hahn echo, CPMG, REDOR, CP, spin-lock/T1rho, DFS) is just a specific ordering "
-    "of these same primitive blocks (visuspin.sequences.blocks) acting on the same underlying isochromat "
-    "ensemble (visuspin.physics.bloch) — remix any preset above to build your own."
+key_takeaway(
+    "Hahn echo, CPMG, REDOR, cross-polarization, spin-lock/T1rho — every one of these is the "
+    "same handful of primitives (Pulse, Delay, Loop, SpinLock, Acquire, Recouple, CrossPolarize, "
+    "DFSSweep) in a different order, acting on the same Bloch-equation physics from Lesson 0. "
+    "There's no separate 'REDOR simulator' or 'CPMG simulator' underneath VisuSpin — just this "
+    "one engine, composed differently."
 )
+
+st.divider()
+st.markdown(
+    """
+### You've completed the VisuSpin path
+
+From a single precessing spin (Lesson 0) to the four things that broaden a
+solid's spectrum (Lessons 2-4), the one trick that fixes some of it (Lesson
+5) and the one that finishes the job (Lesson 6), how to excite and correlate
+quadrupolar and coupled nuclei efficiently (Lessons 7-9), and finally how
+real pulse sequences are actually built (this lesson) — that's the whole
+arc. Jump back to any lesson from the sidebar to revisit it, or use the
+**Nuclide**, **B0**, **Cq**, and coupling sliders throughout to try it on a
+system you actually care about.
+"""
+)
+try:
+    st.page_link("Home.py", label="Back to the lesson overview", icon="🏠")
+except Exception:
+    st.caption("Back to the lesson overview: Home.py")

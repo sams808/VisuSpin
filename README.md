@@ -6,25 +6,34 @@
 
 ---
 
-VisuSpin is a set of interactive, physically-grounded simulations for
-teaching solid-state (and general) NMR spin dynamics. Every plot is computed
+VisuSpin is a guided, 11-lesson path through solid-state NMR spin physics,
+built for students with **no prior NMR background**. Every plot is computed
 live from the actual underlying physics — exact per-isochromat Bloch
 integration, first-principles spin-operator diagonalization, or direct
 numerical powder/rotor simulation — from the parameters you choose, not from
-pre-rendered pictures.
+pre-rendered pictures. Each lesson opens with a concrete motivating question,
+builds the idea up one step at a time, and asks you to predict what a plot
+will show *before* revealing it, then hands over the full explorer once the
+concept has landed.
 
-## What's inside
+## The path
 
-| Page | What it teaches |
-|---|---|
-| **Relaxation Explorer** | T1/T2/T2\* Bloch simulation: real nuclide table, finite pulses, CT-selective & DFS excitation, MAS |
-| **Lineshapes** | CSA, dipolar Pake pattern, 1st/2nd-order quadrupolar CT, MAS sidebands |
-| **Powder Averaging (3D)** | Which crystallite orientations build which part of a powder pattern |
-| **MQMAS** | Why correlating a multiple-quantum dimension removes 2nd-order quadrupolar broadening |
-| **HMQC** | 2D heteronuclear correlation via J- or D-mediated coherence transfer |
-| **Multiplets & Decoupling** | J-multiplets collapsing under heteronuclear decoupling |
-| **Nutation & CT-Selectivity** | Non-sinusoidal quadrupolar nutation, (I+1/2) enhancement, DFS adiabatic sweeps |
-| **Pulse Sequence Composer** | Build sequences (Hahn echo, CPMG, REDOR, CP, spin-lock, DFS, ...) block by block, Scratch-style, with live timing diagrams |
+| # | Lesson | What it teaches |
+|---|---|---|
+| 0 | **NMR Fundamentals** | Magnetization, precession, RF pulses, T1/T2, the FID, and the Fourier transform |
+| 1 | **Relaxation Explorer** | Why the same sample decays two different ways — T2 vs. T2*, and how an echo tells them apart |
+| 2 | **Chemical Shift Anisotropy** | Why a solid powder turns one sharp solution-NMR peak into a broad hump |
+| 3 | **Dipolar Coupling** | Two nearby nuclei as tiny bar magnets — the Pake doublet, and a 1/r³ distance ruler |
+| 4 | **Quadrupolar Interactions** | Why ²³Na, ²⁷Al, ¹¹B and friends look so different from ¹H — and why higher field narrows their lines |
+| 5 | **Magic-Angle Spinning** | One trick, spinning at 54.74°, that erases CSA, dipolar, and first-order quadrupolar broadening at once |
+| 6 | **MQMAS** | The 2D trick that finishes the job MAS alone can't |
+| 7 | **Nutation & CT-Selectivity** | Exciting quadrupolar nuclei efficiently, and boosting signal further with DFS |
+| 8 | **J-Coupling & Decoupling** | The one coupling that doesn't care about orientation — and how to switch it off on purpose |
+| 9 | **HMQC** | Turning "these nuclei are coupled" into a 2D map of exactly which atoms are linked to which |
+| 10 | **Pulse Sequence Composer** | Capstone: build Hahn echo, CPMG, REDOR, CP and more from the same handful of primitives |
+
+Go in order the first time through; after that, jump to any lesson from the
+sidebar as a reference.
 
 ## Install (Windows, for students)
 
@@ -62,8 +71,9 @@ visuspin/
   sequences/    # block-based pulse-sequence engine (Pulse, Delay, Loop,
                 # SpinLock, Acquire, Recouple, CrossPolarize, DFSSweep) +
                 # named presets + timing-diagram renderer
-  ui/           # Streamlit pages — thin views over visuspin.physics /
-                # visuspin.sequences, no physics logic of its own
+  ui/           # Streamlit pages (pages/0_..10_*.py, one per lesson) — thin
+                # views + narrative over visuspin.physics/visuspin.sequences,
+                # no physics logic of its own
 tests/          # one test file per physics module, run directly with
                 # `python tests/test_*.py` (or via pytest)
 scripts/        # install.ps1 / update.ps1 (see above)
