@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 
-from common import page_header, lesson_header, key_takeaway, term, predict_then_reveal, next_lesson
+from common import page_header, lesson_header, key_takeaway, term, predict_then_reveal, next_lesson, animated_plot
 from visuspin.physics.nuclides import NUCLIDES, nu0_hz
 from visuspin.physics import bloch
 from visuspin.sequences.blocks import SequenceContext
@@ -140,18 +140,17 @@ bloch.apply_pulse(ens_trace, flip_deg, 0.0, nu1_khz, "hard", 1.0)
 trace = bloch.run_free_precession(ens_trace, acquire_ms, T1, T2, mas_rate_khz, n_samples=max(400, int(acquire_ms * 4)))
 
 t_snap = st.slider("Vector-plot snapshot time (ms)", 0.0, float(acquire_ms), 0.0, float(acquire_ms) / 200 or 0.01)
-ens_snap = bloch.Ensemble.from_gaussian_offsets(n_iso, sigma_rad_per_ms, seed=rng_seed)
-bloch.apply_pulse(ens_snap, flip_deg, 0.0, nu1_khz, "hard", 1.0)
-n_sub = max(1, int(t_snap / max(acquire_ms, 1e-9) * 400))
-dt_sub = t_snap / n_sub if n_sub > 0 else 0.0
-t_cursor = 0.0
-for _ in range(n_sub):
-    bloch.step(ens_snap, dt_sub, t_cursor, T1, T2, mas_rate_khz)
-    t_cursor += dt_sub
 
-col1, col2 = st.columns([1, 1.3])
 
-with col1:
+def _build_snapshot_fig(t):
+    ens_snap = bloch.Ensemble.from_gaussian_offsets(n_iso, sigma_rad_per_ms, seed=rng_seed)
+    bloch.apply_pulse(ens_snap, flip_deg, 0.0, nu1_khz, "hard", 1.0)
+    n_sub = max(1, int(t / max(acquire_ms, 1e-9) * 400))
+    dt_sub = t / n_sub if n_sub > 0 else 0.0
+    t_cursor = 0.0
+    for _ in range(n_sub):
+        bloch.step(ens_snap, dt_sub, t_cursor, T1, T2, mas_rate_khz)
+        t_cursor += dt_sub
     fig = plt.figure(figsize=(5, 5))
     ax = fig.add_subplot(111, projection="3d")
     u, v = np.linspace(0, 2 * np.pi, 30), np.linspace(0, np.pi, 15)
@@ -164,9 +163,14 @@ with col1:
     ax.plot([0, mx0], [0, my0], [0, mz0], color="#5b46e5", linewidth=3.5)
     ax.set_xlim(-1, 1); ax.set_ylim(-1, 1); ax.set_zlim(-1, 1)
     ax.set_xlabel("x"); ax.set_ylabel("y"); ax.set_zlabel("z")
-    ax.set_title(f"Isochromats at t = {t_snap:.2f} ms")
-    st.pyplot(fig)
-    plt.close(fig)
+    ax.set_title(f"Isochromats at t = {t:.2f} ms")
+    return fig
+
+
+col1, col2 = st.columns([1, 1.3])
+
+with col1:
+    animated_plot("relax_snapshot", np.linspace(0, acquire_ms, 24), _build_snapshot_fig, t_snap, button_label="▶ Play FID")
 
 with col2:
     fig2, axs = plt.subplots(2, 1, figsize=(6, 5.2), sharex=True)

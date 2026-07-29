@@ -35,16 +35,25 @@ concept has landed.
 Go in order the first time through; after that, jump to any lesson from the
 sidebar as a reference.
 
+There's also a **Live Vector Explorer** — a real-time, 60fps animated
+companion to Lesson 1, built as a single self-contained HTML/JS file (no
+Python, no Streamlit) and reachable both as a page inside the app and as a
+standalone double-click launch (see below).
+
 ## Install (Windows, for students)
 
 1. Download or `git clone` this repository.
 2. In the VisuSpin folder, right-click **`scripts\install.ps1`** → **Run with PowerShell**.
    (If Windows blocks it, open PowerShell in that folder and run
    `powershell -ExecutionPolicy Bypass -File scripts\install.ps1` instead.)
-3. Double-click **`run_visuspin.bat`** to launch the app — it opens in your browser.
+3. Double-click **`run_visuspin.bat`** to launch the full app — it opens in your browser.
+   Or double-click **`run_visuspin_live.bat`** to open just the Live Vector
+   Explorer directly, with no Python/Streamlit involved at all.
 
 The installer creates a self-contained virtual environment (`.venv`) inside
-the project folder; it never touches your system Python.
+the project folder; it never touches your system Python. `run_visuspin_live.bat`
+doesn't need the installer or the virtual environment at all — it just opens
+an HTML file in your browser.
 
 ### Updating
 
@@ -71,13 +80,17 @@ visuspin/
   sequences/    # block-based pulse-sequence engine (Pulse, Delay, Loop,
                 # SpinLock, Acquire, Recouple, CrossPolarize, DFSSweep) +
                 # named presets + timing-diagram renderer
-  ui/           # Streamlit pages (pages/0_..10_*.py, one per lesson) — thin
-                # views + narrative over visuspin.physics/visuspin.sequences,
-                # no physics logic of its own
+  ui/           # Streamlit pages (pages/0_..10_*.py, one per lesson, plus
+                # 11_Live_Vector_Explorer.py) — thin views + narrative over
+                # visuspin.physics/visuspin.sequences, no physics logic of its own
+  classic/      # live_vector_explorer.html — standalone real-time JS/canvas
+                # companion tool, embedded into page 11 and launchable directly
 tests/          # one test file per physics module, run directly with
                 # `python tests/test_*.py` (or via pytest)
 scripts/        # install.ps1 / update.ps1 (see above)
 assets/         # logo, icon
+run_visuspin.bat        # launches the full Streamlit app
+run_visuspin_live.bat   # launches just the Live Vector Explorer, no Python needed
 ```
 
 ## Scope & honesty about simplifications

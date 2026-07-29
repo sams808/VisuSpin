@@ -1,0 +1,1244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VisuSpin — Live Vector Explorer</title>
+<style>
+  :root{
+    --bg:#FAFAF7; --card:#FFFFFF; --ink:#1B1B18; --ink-soft:#6B6F76; --border:#DEDBD1;
+    --accent:#0072B2; --accent2:#E66100; --grey:#9A9A9A; --chip:#F0EEE7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1A1B1E; --card:#222327; --ink:#EDEBE4; --ink-soft:#9AA0A8; --border:#34363B; --chip:#2A2C31; }
+  }
+  :root[data-theme="dark"]{ --bg:#1A1B1E; --card:#222327; --ink:#EDEBE4; --ink-soft:#9AA0A8; --border:#34363B; --chip:#2A2C31; }
+  :root[data-theme="light"]{ --bg:#FAFAF7; --card:#FFFFFF; --ink:#1B1B18; --ink-soft:#6B6F76; --border:#DEDBD1; --chip:#F0EEE7; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",-apple-system,"Helvetica Neue",Arial,sans-serif;}
+  .wrap{max-width:1280px;margin:0 auto;padding:28px 20px 60px;}
+  h1{font-family:Georgia,'Palatino Linotype',serif;font-weight:500;font-size:26px;margin:0 0 4px;}
+  .sub{color:var(--ink-soft);font-size:14px;margin:0 0 20px;max-width:80ch;}
+  .stage{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:14px;}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;}
+  .panel h3{margin:2px 6px 8px;font-size:13px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+  canvas{width:100%;display:block;background:transparent;}
+  .controls{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;}
+  .ctrl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px 26px;}
+  .field label{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:4px;}
+  .field .val{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700;}
+  input[type=range]{width:100%;accent-color:var(--accent);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+  button{
+    appearance:none;border:1px solid var(--border);background:var(--chip);color:var(--ink);
+    font:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;
+  }
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  button.accent2{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+  button:disabled{opacity:.45;cursor:default;}
+  .toggles{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;align-items:center;}
+  .toggles label{display:flex;gap:6px;align-items:center;}
+  .readout{
+    margin-top:14px;padding:10px 14px;background:var(--chip);border-radius:8px;font-size:13.5px;
+    display:flex;gap:24px;flex-wrap:wrap;font-variant-numeric:tabular-nums;
+  }
+  .readout b{color:var(--accent2);}
+  .physetup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px 26px;}
+  select{
+    width:100%;font:inherit;font-size:13.5px;font-weight:600;padding:7px 8px;border-radius:8px;
+    border:1px solid var(--border);background:var(--card);color:var(--ink);
+  }
+  .phys-readout{
+    margin-top:12px;padding:9px 14px;background:var(--chip);border-radius:8px;font-size:13px;
+    font-variant-numeric:tabular-nums;
+  }
+  .phys-readout b{color:var(--accent);}
+  #levelsCanvas{margin-top:10px;background:transparent;}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .caption-line{min-height:20px;font-size:13px;color:var(--ink-soft);font-style:italic;margin-top:8px;}
+  footer{margin-top:22px;font-size:12px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+    <svg width="46" height="46" viewBox="0 0 160 160" aria-hidden="true">
+      <defs>
+        <linearGradient id="vsArrowLive" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#5b46e5"/>
+          <stop offset="100%" stop-color="#8a7bff"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="160" height="160" rx="28" fill="#f5f4ff"/>
+      <g transform="translate(80,86)">
+        <line x1="0" y1="-58" x2="0" y2="58" stroke="#9aa0b4" stroke-width="3.5" stroke-dasharray="2 7" stroke-linecap="round"/>
+        <ellipse cx="0" cy="16" rx="50" ry="15" fill="none" stroke="#f0a83c" stroke-width="3" stroke-dasharray="1 6"/>
+        <line x1="0" y1="0" x2="43" y2="-43" stroke="url(#vsArrowLive)" stroke-width="8.5" stroke-linecap="round"/>
+        <path d="M 43 -43 l -17 3 M 43 -43 l -3 17" fill="none" stroke="url(#vsArrowLive)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="0" cy="0" r="5.5" fill="#2a2f45"/>
+      </g>
+    </svg>
+    <div>
+      <div style="font-size:1.4rem;font-weight:700;font-family:'Segoe UI',-apple-system,'Helvetica Neue',Arial,sans-serif;">Visu<span style="color:#5b46e5">Spin</span></div>
+      <div style="font-size:0.82rem;color:var(--ink-soft);">Live Vector Explorer</div>
+    </div>
+  </div>
+  <h1>T1 / T2 / T2* explorer</h1>
+  <p class="sub">60 independent isochromats evolve under the Bloch equations in the rotating frame (exact analytic
+    stepping per isochromat, not Euler). The vector display shows every individual isochromat plus their
+    <b>vector sum</b> — that sum, not any one isochromat, is what a spectrometer actually detects. Set
+    field inhomogeneity to zero and watch T2* become T2.</p>
+
+  <div class="panel physetup">
+    <h3>Nucleus &amp; field</h3>
+    <div class="physetup-grid">
+      <div class="field">
+        <label>nucleus</label>
+        <select id="nucleus"></select>
+      </div>
+      <div class="field">
+        <label>B0 field <span class="val" id="b0val"></span> T</label>
+        <input type="range" id="b0" min="10" max="200" value="94">
+      </div>
+      <div class="field" id="cqField" style="display:none">
+        <label>quadrupolar coupling Cq <span class="val" id="cqval"></span> MHz</label>
+        <input type="range" id="cq" min="0" max="100" value="0">
+      </div>
+      <div class="field">
+        <label>static/inhomogeneous linewidth <span class="val" id="ppmval"></span> ppm</label>
+        <input type="range" id="ppm" min="0" max="1000" value="280">
+      </div>
+      <div class="field">
+        <label>MAS rate &nu;<sub>rot</sub> <span class="val" id="masval"></span> kHz</label>
+        <input type="range" id="mas" min="0" max="1000" value="0">
+      </div>
+    </div>
+    <div class="phys-readout" id="physReadout"></div>
+    <canvas id="levelsCanvas" width="1160" height="230"></canvas>
+  </div>
+
+  <div class="stage">
+    <div class="panel">
+      <h3>Vector display</h3>
+      <canvas id="vecCanvas" width="420" height="420"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Time traces</h3>
+      <canvas id="traceCanvas" width="480" height="420"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Spectrum (live FFT of the FID)</h3>
+      <canvas id="specCanvas" width="420" height="420"></canvas>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl-grid">
+      <div class="field">
+        <label>T1 (longitudinal) <span class="val" id="t1val"></span> ms</label>
+        <input type="range" id="t1" min="0" max="1000" value="500">
+      </div>
+      <div class="field">
+        <label>T2 (transverse, per isochromat) <span class="val" id="t2val"></span> ms</label>
+        <input type="range" id="t2" min="0" max="1000" value="620">
+      </div>
+      <div class="field">
+        <label>playback speed <span class="val" id="spval"></span>&times;</label>
+        <input type="range" id="speed" min="-200" max="100" value="0">
+      </div>
+    </div>
+
+    <div class="row" style="align-items:flex-end;">
+      <div class="field" style="min-width:200px;">
+        <label>B1 field &nu;1 <span class="val" id="nu1val"></span> kHz</label>
+        <input type="range" id="nu1" min="5" max="100" value="25">
+      </div>
+      <div class="field" style="min-width:170px;">
+        <label>pulse shape</label>
+        <select id="pulseShape">
+          <option value="hard">hard (rectangular)</option>
+          <option value="soft">soft (shaped, sigmoid-like ramp)</option>
+        </select>
+      </div>
+      <div class="field" id="dfsDurField" style="min-width:180px;display:none;">
+        <label>DFS sweep duration <span class="val" id="dfsDurVal"></span> ms</label>
+        <input type="range" id="dfsDur" min="1" max="100" value="20">
+      </div>
+    </div>
+    <div class="row">
+      <button class="accent2" id="btn90">90&deg;x pulse</button>
+      <button class="accent2" id="btn180x">180&deg;x pulse</button>
+      <button class="accent2" id="btn180y">180&deg;y pulse</button>
+      <button class="accent2" id="btnDFS" style="display:none;">DFS pulse</button>
+      <button id="btnReset">reset to equilibrium</button>
+      <button class="primary" id="btnPlay">pause</button>
+      <button id="btnStep">step</button>
+    </div>
+
+    <div class="row toggles">
+      <label><input type="checkbox" id="showIso" checked> show individual isochromats</label>
+      <label>spins shown <span class="val" id="nShownVal"></span><input type="range" id="nShown" min="1" max="60" value="10" style="width:90px;margin:0 4px;"></label>
+      <label><input type="checkbox" id="showRes" checked> show resultant</label>
+      <label><input type="checkbox" id="labFrame"> laboratory frame (fast whirl)</label>
+    </div>
+
+    <div class="presets">
+      <button id="pFID">Preset: free induction decay</button>
+      <button id="pEcho">Preset: Hahn echo</button>
+      <button id="pIR">Preset: inversion recovery</button>
+      <button id="pCPMG">Preset: CPMG</button>
+    </div>
+    <div class="caption-line" id="captionLine"></div>
+
+    <div class="readout">
+      <span>t = <b id="rT">0</b> ms</span>
+      <span>T2* (formula: T2 &amp; linewidth) = <b id="rT2s">-</b> ms</span>
+      <span>T2* (fit to this decay) = <b id="rT2fit">-</b> ms</span>
+      <span>&Sigma;Mz = <b id="rMz">-</b></span>
+      <span>|&Sigma;Mxy| = <b id="rMxy">-</b></span>
+      <span>FWHM (FFT) = <b id="rFwhm">-</b></span>
+      <span>&Delta;&nu; = 1/(&pi;T2*) = <b id="rDnu">-</b></span>
+    </div>
+  </div>
+
+  <footer>
+    Model: dMx/dt = &Delta;&omega;&middot;My &minus; Mx/T2, dMy/dt = &minus;&Delta;&omega;&middot;Mx &minus; My/T2,
+    dMz/dt = &minus;(Mz&minus;M0)/T1, per isochromat, integrated exactly (not forward Euler).
+    B1 &Vert; +x, so a 90&deg;x pulse sends M from +z to &minus;y.
+    The nucleus selector uses real (&gamma;, I, natural abundance) values to set a real Larmor frequency
+    &nu;0 = &gamma;B0/2&pi;, and the inhomogeneous linewidth slider is a real ppm value converted through
+    &nu;0 &mdash; so changing B0 genuinely changes the offset distribution in Hz, exactly as on a real spectrometer.
+    Isochromat offsets are drawn Gaussian per the original spec; the "formula" T2* uses the stated
+    1/T2* = 1/T2 + &Delta;&omega;<sub>inhom</sub>/2 relation exactly (that relation is only exact for a
+    <i>Lorentzian</i> offset distribution), while "fit" T2* is a live least-squares fit to ln|&Sigma;Mxy(t)|
+    since the last 90&deg; pulse &mdash; the two are shown side by side deliberately, so the Gaussian-vs-Lorentzian
+    approximation is visible rather than hidden. For spin I &gt; 1/2, Cq contributes an illustrative
+    Cq&sup2;/&nu;0 second-order-quadrupolar broadening term (a real scaling law — higher field narrows
+    quadrupolar lines — with an illustrative, not compound-specific, prefactor); satellite transitions and
+    the full quadrupolar lineshape are not separately simulated, only the central-transition-like vector sum.
+    Pulses are no longer instantaneous rotations: each 90&deg;/180&deg; pulse is a finite-duration B1 field
+    (real &nu;1 in kHz, hard or sin&sup2;-shaped) applied via the full effective-field rotation, so off-resonance
+    isochromats genuinely tip along a different axis than on-resonance ones — real pulse-imperfection physics,
+    not idealised. Real pulses are microseconds long, far too fast to watch at 1&times;, so the tip trajectory
+    is explicitly played back over a fixed ~0.9 s window regardless of duration — a deliberate "zoom in",
+    not a claim that it runs at that speed.
+    For half-integer quadrupolar spins (not integer spins like &sup2;H, which have no distinguished
+    central transition), the "Energy levels &amp; RF excitation" panel shows the satellite manifold as a
+    Monte-Carlo powder pattern (&eta;=0, first-order only; every transition powder-averages to exactly
+    the CT frequency, only its width grows with |m&minus;&#189;|) and overlays the pulse's actual
+    excitation profile, computed by running the same rotation physics on swept test offsets so it's
+    guaranteed consistent with the pulse really applied. When the pulse bandwidth sits well inside the
+    satellite manifold the tool reports CT-selective excitation and applies the standard (I+&#189;)
+    nutation-rate enhancement; once the bandwidth covers the satellites too, it reports non-selective
+    excitation and drops the enhancement. DFS (double frequency sweep) is a constant-amplitude pulse
+    whose RF frequency is linearly swept across the satellite manifold &mdash; each isochromat crosses
+    resonance with the sweep at a different instant, the actual adiabatic mechanism DFS relies on, not a
+    scripted effect. MAS is a single-harmonic cos(&omega;<sub>r</sub>t+&phi;) modulation of each
+    isochromat's static offset (a simplified stand-in for the real two-harmonic
+    (3cos&sup2;&theta;(t)&minus;1) modulation) &mdash; it correctly narrows the decay envelope in the
+    live trace/FFT panels, but that panel's fixed 2 ms sample interval can only resolve sidebands out to
+    ~250 Hz, unrealistically slow for real MAS rates (kHz-scale); the sideband structure itself is shown
+    properly rebinned in the "Energy levels &amp; RF excitation" panel instead, which isn't subject to
+    that sampling limit. That panel now shows a frequency axis, pulse excitation profile, and MAS
+    sidebands for <i>every</i> nucleus, not just quadrupolar ones: half-integer quadrupolar spins get
+    the real multi-transition satellite powder pattern described above, while spin-1/2 and integer-spin
+    nuclei get the same Gaussian (from T2* and the linewidth slider) that's actually driving their
+    isochromat ensemble, so the pattern shown is always tied to real simulated physics, never a
+    placeholder. &sup10;B is included as spin I=3 (integer, quadrupolar, no central transition) &mdash;
+    note this is the real value; an earlier request for this nucleus assumed I=1, which is incorrect.
+    Individual isochromats are now drawn <i>after</i> the resultant rather than before, so the thin grey
+    arrows stay visible on top instead of being covered by the thick blue one when they're still nearly
+    coincident (e.g. immediately after a clean pulse, before dephasing has had time to develop).
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+const COL = { black:"#000000", orange:"#E66100", grey:"#9A9A9A", blue:"#0072B2", dgrey:"#4D4D4D" };
+
+// ---------------- nuclide data (standard literature gamma values, rad s^-1 T^-1) ----------------
+const NUCLEI = {
+  "1H":  {gamma:267.522e6,  I:0.5, abund:99.98},
+  "2H":  {gamma:41.065e6,   I:1.0, abund:0.0115},
+  "13C": {gamma:67.283e6,   I:0.5, abund:1.07},
+  "15N": {gamma:-27.126e6,  I:0.5, abund:0.37},
+  "19F": {gamma:251.815e6,  I:0.5, abund:100},
+  "29Si":{gamma:-53.190e6,  I:0.5, abund:4.68},
+  "31P": {gamma:108.394e6,  I:0.5, abund:100},
+  "7Li": {gamma:103.962e6,  I:1.5, abund:92.4},
+  "10B": {gamma:28.746e6,   I:3.0, abund:19.9},
+  "11B": {gamma:85.847e6,   I:1.5, abund:80.1},
+  "17O": {gamma:-36.264e6,  I:2.5, abund:0.038},
+  "23Na":{gamma:70.808e6,   I:1.5, abund:100},
+  "27Al":{gamma:69.763e6,   I:2.5, abund:100},
+};
+const SUP = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹"};
+function formatNucleus(k){
+  const m = k.match(/^(\d+)([A-Za-z]+)$/);
+  if(!m) return k;
+  return m[1].split("").map(d=>SUP[d]||d).join("")+m[2];
+}
+function fmtSpin(I){ return Number.isInteger(I) ? String(I) : Math.round(I*2)+"/2"; }
+// The CT/satellite/Cq machinery below applies to half-integer quadrupolar spins
+// (3/2, 5/2, 7/2, ...) where a distinguished +1/2<->-1/2 central transition exists.
+// Integer-spin quadrupolar nuclei (e.g. 2H, I=1) have no such transition, so they're
+// deliberately excluded even though I > 1/2.
+function isHalfIntQuad(I){ return I>0.5 && !Number.isInteger(I); }
+
+let nucleusKey = "1H";
+let B0 = 9.4;        // Tesla
+let cqMHz = 0;        // quadrupolar coupling constant, MHz (half-integer I > 1/2 only)
+let linewidthPpm = 0.03; // static/inhomogeneous linewidth, ppm
+let masRateKHz = 0;    // MAS spinning rate, kHz (0 = static, no spinning)
+
+// log-scale mapping (0 is a hard special case; 1..1000 spans 0.001-200 ppm) so the
+// slider has fine resolution where T2* ~ T2 lives *and* reaches solid-like broad lines.
+function ppmFromSlider(v){
+  if(v<=0) return 0;
+  const lo=Math.log(0.001), hi=Math.log(200);
+  return Math.exp(lo+(hi-lo)*(v/1000));
+}
+
+function nu0Hz(){ return Math.abs(NUCLEI[nucleusKey].gamma)*B0/(2*Math.PI); }
+function extraPpmFromCq(){
+  const nuc = NUCLEI[nucleusKey];
+  if(!isHalfIntQuad(nuc.I) || cqMHz<=0) return 0;
+  const nu0MHz = nu0Hz()/1e6;
+  // Real scaling law for second-order quadrupolar broadening: proportional to Cq^2/nu0
+  // (higher field narrows quadrupolar lines). Prefactor here is illustrative, not fit to
+  // a specific compound/asymmetry parameter -- disclosed in the footer.
+  return 3.0*cqMHz*cqMHz/Math.max(nu0MHz,1e-6);
+}
+function effectivePpm(){ return linewidthPpm + extraPpmFromCq(); }
+function sigmaRadMs(){ return 2*Math.PI*(effectivePpm()*1e-6)*nu0Hz()/1000; }
+
+// ---------------- satellite transition powder pattern (half-integer quadrupolar only) ----------------
+// First-order quadrupolar shift, axially symmetric EFG (eta=0 -- disclosed simplification):
+// shift(m,theta) = -wQscale*(m-1/2)*(3cos^2(theta)-1)/2, wQscale = 3*Cq/(2I(2I-1)).
+// Powder-averages to exactly zero for every transition (well-known result), so every
+// satellite pattern is centred on the CT frequency -- only its *width* grows with |m-1/2|,
+// giving the classic "sharp CT sitting on a broad satellite pedestal" static lineshape.
+let satPatternCache = { key:null, bins:null, maxAbsShiftKHz:0 };
+function computeSatellitePattern(){
+  const nuc = NUCLEI[nucleusKey];
+  const key = nucleusKey+"|"+cqMHz+"|"+B0;
+  if(satPatternCache.key===key) return satPatternCache;
+  if(!isHalfIntQuad(nuc.I) || cqMHz<=0){ satPatternCache={key,bins:null,maxAbsShiftKHz:0}; return satPatternCache; }
+  const I = nuc.I;
+  const wQscaleKHz = (3*cqMHz*1000)/(2*I*(2*I-1));
+  const transitions = [];
+  for(let m=I; m>=-I+1+1e-9; m-=1){ if(Math.abs(m-0.5)>1e-6) transitions.push(m); }
+  const maxCoeff = Math.max(...transitions.map(m=>Math.abs(m-0.5)));
+  const maxShiftKHz = wQscaleKHz*maxCoeff;
+  const NBINS = 240, NSAMP = 3000;
+  const bins = new Float64Array(NBINS);
+  const rng = mulberry32(777);
+  for(const m of transitions){
+    const coeff = m-0.5;
+    for(let i=0;i<NSAMP;i++){
+      const u = rng()*2-1; // cos(theta), uniform on the sphere
+      const ang = (3*u*u-1)/2;
+      const shiftKHz = -wQscaleKHz*coeff*ang;
+      let idx = Math.floor((shiftKHz+maxShiftKHz)/(2*maxShiftKHz)*NBINS);
+      idx = Math.max(0, Math.min(NBINS-1, idx));
+      bins[idx] += 1;
+    }
+  }
+  let mx=0; for(const v of bins) if(v>mx) mx=v;
+  if(mx>0) for(let i=0;i<NBINS;i++) bins[i]/=mx;
+  satPatternCache = { key, bins, maxAbsShiftKHz:maxShiftKHz };
+  return satPatternCache;
+}
+function satelliteHalfWidthKHz(){ return computeSatellitePattern().maxAbsShiftKHz||0; }
+
+// ---------------- generic static pattern (non-quadrupolar / no distinguished CT) ----------------
+// Same {bins, maxAbsShiftKHz} shape as computeSatellitePattern() so the RF panel can
+// render both cases with one code path. Built directly from the *same* Gaussian
+// (sigma = sigmaRadMs()) that actually drives the isochromat ensemble, so what's shown
+// here is guaranteed consistent with the simulated decay, not a separate illustration.
+let genericPatternCache = { key:null, bins:null, maxAbsShiftKHz:0 };
+function computeGenericPattern(){
+  const key = nucleusKey+"|"+linewidthPpm+"|"+B0+"|"+cqMHz;
+  if(genericPatternCache.key===key) return genericPatternCache;
+  const sigmaKHz = sigmaRadMs()/(2*Math.PI); // rad/ms -> kHz (1 kHz = 2*pi rad/ms)
+  if(sigmaKHz<=1e-6){ genericPatternCache={key,bins:null,maxAbsShiftKHz:0}; return genericPatternCache; }
+  const maxShiftKHz = sigmaKHz*4.5;
+  const NBINS = 240;
+  const bins = new Float64Array(NBINS);
+  for(let i=0;i<NBINS;i++){
+    const freqKHz = -maxShiftKHz + i/(NBINS-1)*2*maxShiftKHz;
+    bins[i] = Math.exp(-0.5*(freqKHz/sigmaKHz)*(freqKHz/sigmaKHz));
+  }
+  genericPatternCache = { key, bins, maxAbsShiftKHz: maxShiftKHz };
+  return genericPatternCache;
+}
+
+// ---------------- physics ----------------
+const N = 60;
+let T1 = 500, T2 = 620; // ms
+const M0 = 1.0;
+let iso = [];
+let t = 0; // ms
+let playing = true;
+let speedMult = 1;
+let lastPulse90Time = null;
+
+function gaussianRandom(rng){
+  let u=0,v=0; while(u===0)u=rng(); while(v===0)v=rng();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function mulberry32(seed){
+  return function(){ seed|=0; seed=(seed+0x6D2B79F5)|0; let x=Math.imul(seed^seed>>>15,1|seed);
+    x=(x+Math.imul(x^x>>>7,61|x))^x; return ((x^x>>>14)>>>0)/4294967296; };
+}
+function resetIsochromats(){
+  const rng = mulberry32(1234);
+  const rngPhase = mulberry32(5678);
+  const sigma = sigmaRadMs();
+  iso = [];
+  for(let i=0;i<N;i++){
+    // dw is each isochromat's *static* (non-spinning) offset; phi is its random rotor
+    // phase at t=0 (crystallite orientation relative to the spinner), used only when
+    // MAS is active to modulate dw periodically instead of leaving it constant.
+    // cosPhi/sinPhi precomputed once here rather than every substep in stepPhysics --
+    // phi never changes for an isochromat's lifetime, so recomputing it per substep
+    // was pure waste (and a real cost: substeps can run into the hundreds per frame
+    // when MAS is active).
+    const phi = rngPhase()*2*Math.PI;
+    iso.push({ dw: gaussianRandom(rng)*sigma, phi, cosPhi: Math.cos(phi), sinPhi: Math.sin(phi), mx:0, my:0, mz:M0 });
+  }
+  t = 0;
+  lastPulse90Time = null;
+  fidBuffer.length = 0;
+  traceBuf.length = 0;
+  schedule.length = 0;
+  captionLine.textContent = "";
+}
+
+function clampT2(){
+  const maxT2 = 2*T1;
+  if(T2 > maxT2){ T2 = maxT2; t2Slider.value = t2FromVal(T2); }
+}
+
+function stepPhysics(dt){
+  if(dt<=0) return;
+  const decayT2 = Math.exp(-dt/T2);
+  const decayT1 = Math.exp(-dt/T1);
+  // Under MAS, treat each isochromat's static offset as the anisotropic part of its
+  // shift and modulate it at the rotor rate (single-harmonic cos(omega_r t + phi) --
+  // a simplified stand-in for the real two-harmonic (3cos^2(theta(t))-1) modulation,
+  // disclosed in the footer). It time-averages toward zero as MAS rate increases,
+  // which is the qualitative "MAS narrows anisotropic broadening" behaviour.
+  const masActive = masRateKHz>0;
+  const tMid = t + dt/2;
+  const phase0 = masActive ? 2*Math.PI*masRateKHz*tMid : 0;
+  const cosOmega = masActive ? Math.cos(phase0) : 1;
+  const sinOmega = masActive ? Math.sin(phase0) : 0;
+  for(let i=0;i<N;i++){
+    const p = iso[i];
+    // cos(phase0+phi) via the angle-sum identity, using p's precomputed cosPhi/sinPhi
+    // rather than calling Math.cos/sin(p.phi) fresh every substep.
+    const dwEff = masActive ? p.dw*(cosOmega*p.cosPhi - sinOmega*p.sinPhi) : p.dw;
+    const th = dwEff*dt;
+    const c = Math.cos(th), s = Math.sin(th);
+    const mx0=p.mx, my0=p.my;
+    p.mx = (mx0*c + my0*s)*decayT2;
+    p.my = (my0*c - mx0*s)*decayT2;
+    p.mz = M0 + (p.mz-M0)*decayT1;
+    // |M_i| <= M0 holds automatically here: T2-decay only shrinks Mxy, T1-relaxation
+    // moves Mz monotonically toward M0 without overshoot, and pulses are pure rotations.
+  }
+  t += dt;
+  recordSample();
+  runSchedule();
+}
+
+// ---------------- finite-duration RF pulses (real B1, hard or soft-shaped) ----------------
+// Revives the sigmoid-ramp idea from the old (broken) notebooks, done correctly this time:
+// off-resonance isochromats rotate about their own effective field (B1 + their own Delta-omega
+// along z), not a pure x/y rotation, so imperfect excitation of far-off-resonance spins is real
+// physics here, not an idealised instant flip. Precomputed as a short trajectory and played back
+// over a fixed, pleasant wall-clock duration (real pulses are microseconds long -- far too fast
+// to watch at 1x, so this is an explicit "zoom in" cutscene, not a claim that it runs at 1x speed).
+let nu1kHz = 25, pulseShapeKind = "hard";
+let pulseAnim = null; // {trajectory, startPerf, wallMs, durationMs, flipDeg, axisName}
+
+function rodrigues(mx,my,mz, nx,ny,nz, theta){
+  const c=Math.cos(theta), s=Math.sin(theta);
+  const dot = nx*mx+ny*my+nz*mz;
+  const cx = ny*mz - nz*my, cy = nz*mx - nx*mz, cz = nx*my - ny*mx;
+  return [ mx*c + cx*s + nx*dot*(1-c), my*c + cy*s + ny*dot*(1-c), mz*c + cz*s + nz*dot*(1-c) ];
+}
+
+// Real effect: for a half-integer quadrupolar CT, a pulse whose RF bandwidth is much
+// narrower than the satellite manifold only touches the CT ("CT-selective"), and the
+// CT's own nutation rate is then enhanced by exactly (I+1/2) relative to the nominal
+// (spin-1/2-calibrated) rate -- a standard, well-established result. Once the pulse
+// bandwidth is wide enough to also cover the satellites ("non-selective" / hard-pulse
+// limit), the whole multi-level system nutates together and the enhancement vanishes.
+function ctSelectiveEnhancement(){
+  const nuc = NUCLEI[nucleusKey];
+  if(!isHalfIntQuad(nuc.I)) return 1;
+  const halfWidth = satelliteHalfWidthKHz();
+  if(halfWidth<=0) return 1;
+  return nu1kHz < 0.3*halfWidth ? (nuc.I+0.5) : 1;
+}
+
+function startPulse(flipDeg, axisName){
+  const flipRad = flipDeg*Math.PI/180;
+  const enhancement = ctSelectiveEnhancement();
+  const omega1Peak = 2*Math.PI*(nu1kHz*1000)*enhancement; // rad/s
+  const avgFactor = pulseShapeKind==="soft" ? 0.5 : 1.0; // sin^2 envelope averages to exactly 0.5
+  const durationS = flipRad/(omega1Peak*avgFactor);
+  const durationMs = durationS*1000;
+
+  const STEPS = 200;
+  const dtS = durationS/STEPS, dtMs = dtS*1000;
+  let work = iso.map(p=>({mx:p.mx, my:p.my, mz:p.mz, dw:p.dw}));
+  const trajectory = [work.map(p=>({mx:p.mx,my:p.my,mz:p.mz}))];
+  for(let s=0;s<STEPS;s++){
+    const tMid = (s+0.5)*dtS;
+    const shapeVal = pulseShapeKind==="soft" ? Math.pow(Math.sin(Math.PI*tMid/durationS),2) : 1.0;
+    const w1ms = (omega1Peak*shapeVal)/1000; // rad/ms
+    const bx = axisName==="x" ? w1ms : 0, by = axisName==="y" ? w1ms : 0;
+    work = work.map(p=>{
+      const bz = p.dw;
+      const bmag = Math.hypot(bx,by,bz);
+      if(bmag<1e-12) return p;
+      const [mx2,my2,mz2] = rodrigues(p.mx,p.my,p.mz, bx/bmag,by/bmag,bz/bmag, bmag*dtMs);
+      return {mx:mx2,my:my2,mz:mz2,dw:p.dw};
+    });
+    trajectory.push(work.map(p=>({mx:p.mx,my:p.my,mz:p.mz})));
+  }
+  const wallMs = 900;
+  pulseAnim = { trajectory, startPerf: performance.now(), wallMs, durationMs, flipDeg, axisName };
+  const shapeLabel = pulseShapeKind==="soft" ? "soft/shaped" : "hard/rectangular";
+  const durLabel = durationMs<1 ? (durationMs*1000).toFixed(1)+" µs" : durationMs.toFixed(2)+" ms";
+  const enhLabel = enhancement>1 ? " (CT-selective, nutation ×"+enhancement.toFixed(1)+")" : "";
+  captionLine.textContent = "Applying "+flipDeg+"°"+axisName+" "+shapeLabel+" pulse"+enhLabel+" ("+durLabel+" real duration, "+
+    "shown over ~0.9 s so the tip trajectory is visible).";
+}
+
+function finishPulse(){
+  const traj = pulseAnim.trajectory;
+  const finalState = traj[traj.length-1];
+  for(let i=0;i<N;i++){ iso[i].mx=finalState[i].mx; iso[i].my=finalState[i].my; iso[i].mz=finalState[i].mz; }
+  t += pulseAnim.durationMs;
+  if(!pulseAnim.isDFS && Math.round(pulseAnim.flipDeg)===90){ fidBuffer.length=0; lastPulse90Time=t; }
+  pulseAnim = null;
+}
+
+// ---------------- DFS: double frequency sweep (adiabatic, addresses satellites) ----------------
+// A constant-amplitude pulse whose RF frequency is swept linearly through the whole
+// satellite manifold. Each isochromat/satellite orientation passes through resonance
+// (bz = dw - rfOffset(t) crossing zero) at a different instant, which is the adiabatic
+// mechanism DFS uses to transfer satellite population into the CT and enhance its signal.
+let dfsDurationMs = 20;
+function startDFS(){
+  const nuc = NUCLEI[nucleusKey];
+  if(!isHalfIntQuad(nuc.I)) return;
+  const sweepRangeKHz = Math.max(satelliteHalfWidthKHz()*1.15, 5);
+  const durationS = dfsDurationMs/1000;
+  const omega1Peak = 2*Math.PI*(nu1kHz*1000); // no CT enhancement here -- deliberately addressing satellites
+  const STEPS = 240;
+  const dtS = durationS/STEPS, dtMs = dtS*1000;
+  let work = iso.map(p=>({mx:p.mx, my:p.my, mz:p.mz, dw:p.dw}));
+  const trajectory = [work.map(p=>({mx:p.mx,my:p.my,mz:p.mz}))];
+  for(let s=0;s<STEPS;s++){
+    const frac = (s+0.5)/STEPS;
+    const w1ms = omega1Peak/1000;
+    const rfOffsetRadMs = 2*Math.PI*sweepRangeKHz*(1-2*frac); // sweep +range -> -range
+    work = work.map(p=>{
+      const bz = p.dw - rfOffsetRadMs;
+      const bmag = Math.hypot(w1ms,0,bz);
+      if(bmag<1e-12) return p;
+      const [mx2,my2,mz2] = rodrigues(p.mx,p.my,p.mz, w1ms/bmag,0,bz/bmag, bmag*dtMs);
+      return {mx:mx2,my:my2,mz:mz2,dw:p.dw};
+    });
+    trajectory.push(work.map(p=>({mx:p.mx,my:p.my,mz:p.mz})));
+  }
+  pulseAnim = { trajectory, startPerf: performance.now(), wallMs: 1400, durationMs: dfsDurationMs,
+    flipDeg: 0, axisName: "dfs", isDFS: true };
+  captionLine.textContent = "Applying DFS (double frequency sweep, "+dfsDurationMs.toFixed(1)+" ms, sweeping ±"+
+    sweepRangeKHz.toFixed(0)+" kHz through the satellite manifold) — a preparation pulse to enhance CT polarisation.";
+}
+
+// ---------------- pulse excitation profile (frequency domain) ----------------
+// Runs the *same* physics as a real pulse (hard or soft), but on a swept set of test
+// offsets rather than the actual isochromat ensemble, so the excitation-vs-frequency
+// curve shown in the RF panel is guaranteed consistent with the pulse actually applied.
+function finalMxyAfterPulse(dwTestRadMs, ampFn, durationS, omega1Peak){
+  const STEPS = 100;
+  const dtS = durationS/STEPS, dtMs = dtS*1000;
+  let mx=0, my=0, mz=1;
+  for(let s=0;s<STEPS;s++){
+    const frac = (s+0.5)/STEPS;
+    const w1ms = (omega1Peak*ampFn(frac))/1000;
+    const bmag = Math.hypot(w1ms,0,dwTestRadMs);
+    if(bmag<1e-12) continue;
+    const r = rodrigues(mx,my,mz, w1ms/bmag,0,dwTestRadMs/bmag, bmag*dtMs);
+    mx=r[0]; my=r[1]; mz=r[2];
+  }
+  return Math.hypot(mx,my);
+}
+let excProfileCache = { key:null, points:null, rangeKHz:0 };
+function computeExcitationProfile(){
+  const key = nu1kHz+"|"+pulseShapeKind+"|"+cqMHz+"|"+nucleusKey+"|"+B0;
+  if(excProfileCache.key===key) return excProfileCache;
+  const enhancement = ctSelectiveEnhancement();
+  const omega1Peak = 2*Math.PI*(nu1kHz*1000)*enhancement;
+  const avgFactor = pulseShapeKind==="soft" ? 0.5 : 1.0;
+  const durationS = (Math.PI/2)/(omega1Peak*avgFactor); // reference: a 90-degree-calibrated pulse
+  const ampFn = pulseShapeKind==="soft" ? f=>Math.pow(Math.sin(Math.PI*f),2) : f=>1;
+  const satHalfWidth = satelliteHalfWidthKHz();
+  const rangeKHz = Math.max(satHalfWidth*1.3, nu1kHz*4, 5);
+  const N = 140, points = [];
+  for(let i=0;i<N;i++){
+    const freqKHz = -rangeKHz + i/(N-1)*2*rangeKHz;
+    const dwTest = 2*Math.PI*freqKHz; // rad/ms (1 kHz = 1 cycle/ms)
+    points.push({ freqKHz, eff: finalMxyAfterPulse(dwTest, ampFn, durationS, omega1Peak) });
+  }
+  excProfileCache = { key, points, rangeKHz };
+  return excProfileCache;
+}
+
+function fitT2Star(){
+  if(lastPulse90Time===null) return null;
+  const pts = traceBuf.filter(p=>p.t>=lastPulse90Time && p.mxy>1e-3);
+  if(pts.length<5) return null;
+  let sx=0,sy=0,sxx=0,sxy=0; const n=pts.length;
+  for(const p of pts){ const x=p.t-lastPulse90Time, y=Math.log(p.mxy); sx+=x; sy+=y; sxx+=x*x; sxy+=x*y; }
+  const denom = n*sxx-sx*sx;
+  if(Math.abs(denom)<1e-9) return null;
+  const slope = (n*sxy-sx*sy)/denom;
+  if(slope>=0) return null;
+  return -1/slope;
+}
+
+function sumM(){
+  let sx=0,sy=0,sz=0;
+  for(let i=0;i<N;i++){ sx+=iso[i].mx; sy+=iso[i].my; sz+=iso[i].mz; }
+  return { sx:sx/N, sy:sy/N, sz:sz/N };
+}
+
+// ---------------- scheduling (for presets) ----------------
+let schedule = []; // {at: simTime, fn}
+function scheduleAt(dtFromNow, fn){ schedule.push({at:t+dtFromNow, fn}); schedule.sort((a,b)=>a.at-b.at); }
+function runSchedule(){
+  while(schedule.length && schedule[0].at<=t){ const job=schedule.shift(); job.fn(); }
+}
+
+// ---------------- FID buffer + FFT ----------------
+// SAMPLE_DT is adaptive: fixed 2ms is far too coarse to resolve kHz-scale MAS
+// sidebands (Nyquist would top out at 250 Hz), so when MAS is active it tightens
+// enough to resolve several sideband orders without aliasing. Changing it resets
+// the buffers since old samples were taken at a different effective rate.
+const FFT_N = 1024;
+let fidBuffer = []; // {re,im} sampled at SAMPLE_DT after a 90x
+let SAMPLE_DT = 2; // ms between recorded FID samples
+let sinceSample = 0, sinceTrace = 0;
+const TRACE_SAMPLE_DT = 2; // ms; independent of the FID rate, only needs to look smooth
+function updateSampleDT(){
+  const target = masRateKHz>0 ? Math.min(2, (1/masRateKHz)/8) : 2;
+  if(Math.abs(target-SAMPLE_DT) > 1e-9){
+    SAMPLE_DT = target;
+    fidBuffer.length = 0;
+    sinceSample = 0;
+  }
+}
+function recordSample(){
+  sinceSample += lastDt;
+  sinceTrace += lastDt;
+  const needFid = sinceSample >= SAMPLE_DT;
+  const needTrace = sinceTrace >= TRACE_SAMPLE_DT;
+  if(!needFid && !needTrace) return; // skip sumM() entirely on most substeps
+  const s = sumM(); // computed once, reused below -- this used to run twice per call
+  if(needFid){
+    sinceSample = 0;
+    fidBuffer.push({re:s.sx, im:s.sy});
+    if(fidBuffer.length > FFT_N) fidBuffer.shift();
+  }
+  if(!needTrace) return;
+  sinceTrace = 0;
+  traceBuf.push({t, mz:s.sz, mxy:Math.hypot(s.sx,s.sy)});
+  const windowMs = 6*currentT2Star();
+  while(traceBuf.length && (t - traceBuf[0].t) > Math.max(windowMs, 200)) traceBuf.shift();
+}
+
+function fft(re, im){
+  const n = re.length;
+  for(let i=1,j=0;i<n;i++){
+    let bit=n>>1;
+    for(;j&bit;bit>>=1) j^=bit;
+    j^=bit;
+    if(i<j){ [re[i],re[j]]=[re[j],re[i]]; [im[i],im[j]]=[im[j],im[i]]; }
+  }
+  for(let len=2; len<=n; len<<=1){
+    const ang = -2*Math.PI/len;
+    const wr = Math.cos(ang), wi = Math.sin(ang);
+    for(let i=0;i<n;i+=len){
+      let curR=1, curI=0;
+      for(let k=0;k<len/2;k++){
+        const ur=re[i+k], ui=im[i+k];
+        const vr=re[i+k+len/2]*curR - im[i+k+len/2]*curI;
+        const vi=re[i+k+len/2]*curI + im[i+k+len/2]*curR;
+        re[i+k]=ur+vr; im[i+k]=ui+vi;
+        re[i+k+len/2]=ur-vr; im[i+k+len/2]=ui-vi;
+        const nr=curR*wr-curI*wi, ni=curR*wi+curI*wr;
+        curR=nr; curI=ni;
+      }
+    }
+  }
+}
+
+function currentT2Star(){
+  const sigma = sigmaRadMs();
+  return 1/(1/T2 + sigma/2);
+}
+
+// ---------------- rendering: vector display ----------------
+const vecCanvas = document.getElementById("vecCanvas");
+const vctx = vecCanvas.getContext("2d");
+const EX=[0.85,0.52], EY=[1.0,0.0], EZ=[0.0,-1.0];
+function project(x,y,z,ox,oy,scale){
+  return [ox+scale*(x*EX[0]+y*EY[0]+z*EZ[0]), oy+scale*(x*EX[1]+y*EY[1]+z*EZ[1])];
+}
+function drawArrow(ctx,x0,y0,x1,y1,color,width,headLen){
+  headLen = headLen||8;
+  const dx=x1-x0,dy=y1-y0, len=Math.hypot(dx,dy)||1e-6;
+  const ux=dx/len, uy=dy/len;
+  const bx=x1-ux*headLen, by=y1-uy*headLen;
+  ctx.strokeStyle=color; ctx.lineWidth=width; ctx.lineCap="round";
+  ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(bx,by); ctx.stroke();
+  const px=-uy, py=ux, hw=headLen*0.55;
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(bx+px*hw, by+py*hw);
+  ctx.lineTo(bx-px*hw, by-py*hw);
+  ctx.closePath(); ctx.fill();
+}
+let labPhase = 0;
+function drawVectorPanel(){
+  const w=vecCanvas.width, h=vecCanvas.height;
+  vctx.clearRect(0,0,w,h);
+  const ox=w*0.42, oy=h*0.58, scale=w*0.34;
+  // transverse plane
+  vctx.beginPath();
+  for(let i=0;i<=72;i++){ const a=i/72*2*Math.PI; const p=project(0.85*Math.cos(a),0.85*Math.sin(a),0,ox,oy,scale);
+    if(i===0) vctx.moveTo(p[0],p[1]); else vctx.lineTo(p[0],p[1]); }
+  vctx.closePath(); vctx.fillStyle="rgba(200,200,200,0.35)"; vctx.fill();
+  vctx.strokeStyle="#BFBFBF"; vctx.lineWidth=1; vctx.stroke();
+  // triad
+  const AX=1.3;
+  let p0=project(0,0,0,ox,oy,scale), pz=project(0,0,AX,ox,oy,scale);
+  drawArrow(vctx,p0[0],p0[1],pz[0],pz[1],COL.black,1.5,9);
+  let px_=project(AX,0,0,ox,oy,scale);
+  drawArrow(vctx,p0[0],p0[1],px_[0],px_[1],COL.black,1.5,9);
+  let py_=project(0,AX,0,ox,oy,scale);
+  drawArrow(vctx,p0[0],p0[1],py_[0],py_[1],COL.black,1.5,9);
+  vctx.fillStyle=COL.black; vctx.font="bold 13px sans-serif";
+  vctx.fillText("z", pz[0]-4, pz[1]-8);
+  vctx.fillText("x", px_[0]+4, px_[1]+4);
+  vctx.fillText("y", py_[0]+6, py_[1]+4);
+
+  const lab = document.getElementById("labFrame").checked;
+  const phase = lab ? labPhase : 0;
+  const cA=Math.cos(phase), sA=Math.sin(phase);
+  function rotZ(x,y){ return [x*cA - y*sA, x*sA + y*cA]; }
+
+  // Draw the resultant *first* and the individual isochromats *after*, so the thin
+  // grey arrows stay visible on top instead of being covered by the thick blue one --
+  // right after a clean pulse they're all nearly coincident with the resultant, and
+  // drawing order alone was enough to make them look like "just the average".
+  if(document.getElementById("showRes").checked){
+    const s = sumM();
+    const [rx,ry] = rotZ(s.sx,s.sy);
+    const tip = project(rx,ry,s.sz,ox,oy,scale);
+    drawArrow(vctx,p0[0],p0[1],tip[0],tip[1],COL.blue,3.0,13);
+  }
+  if(document.getElementById("showIso").checked){
+    // Show an evenly-spaced *subset* of the 60 isochromats (default 10): all 60
+    // overlapping thin lines tend to blur into an indistinct grey smear, especially
+    // right when they're still coherent -- a handful of individually-traceable
+    // arrows makes the fanning-apart story easier to actually follow with your eye.
+    // The physics (sum, FFT, T1/T2/T2*) always uses the full N=60 regardless.
+    const nShown = Math.min(N, Math.max(1, +document.getElementById("nShown").value));
+    const step = N/nShown;
+    for(let k=0;k<nShown;k++){
+      const pI = iso[Math.floor(k*step)];
+      const [rx,ry] = rotZ(pI.mx,pI.my);
+      const tip = project(rx,ry,pI.mz,ox,oy,scale);
+      drawArrow(vctx,p0[0],p0[1],tip[0],tip[1],COL.grey,1.4,6);
+    }
+  }
+  vctx.fillStyle=COL.dgrey; vctx.font="italic 11px sans-serif";
+  vctx.fillText(lab?"laboratory frame":"rotating frame", 8, 16);
+}
+
+// ---------------- rendering: Zeeman energy levels ----------------
+const levelsCanvas = document.getElementById("levelsCanvas");
+const lctx = levelsCanvas.getContext("2d");
+
+// Rebin a fine powder-pattern histogram into MAS spinning sidebands: a common,
+// honestly-approximate stand-in for full Herzfeld-Berger sideband intensities --
+// each sideband's height is just the static lineshape's density integrated over a
+// nu_rot-wide window centred on that sideband order. Qualitatively correct (many
+// sidebands tracing the static envelope at slow MAS, collapsing toward a single
+// centreband as MAS rate increases) without claiming exact intensities.
+function sidebandsFromPattern(bins, maxAbsShiftKHz, nuRotKHz){
+  const nb = bins.length;
+  const maxOrder = Math.ceil(maxAbsShiftKHz/nuRotKHz)+1;
+  const sidebands = [];
+  for(let k=-maxOrder;k<=maxOrder;k++){
+    const centerKHz = k*nuRotKHz;
+    const loKHz = centerKHz-nuRotKHz/2, hiKHz = centerKHz+nuRotKHz/2;
+    let sum=0;
+    for(let i=0;i<nb;i++){
+      const freqKHz = -maxAbsShiftKHz + i/(nb-1)*2*maxAbsShiftKHz;
+      if(freqKHz>=loKHz && freqKHz<hiKHz) sum+=bins[i];
+    }
+    if(sum>1e-6) sidebands.push({freqKHz:centerKHz, weight:sum});
+  }
+  let mx=1e-9; for(const s of sidebands) if(s.weight>mx) mx=s.weight;
+  sidebands.forEach(s=>s.weight/=mx);
+  return sidebands;
+}
+
+function drawLevels(){
+  const w=levelsCanvas.width, h=levelsCanvas.height;
+  lctx.clearRect(0,0,w,h);
+  const nuc = NUCLEI[nucleusKey];
+  const I = nuc.I;
+  const quad = isHalfIntQuad(I);
+  const levels = [];
+  for(let m=I; m>=-I-1e-9; m-=1) levels.push(m);
+  const n = levels.length;
+  const marginX=10, labelW=150, x0=marginX, x1=w-labelW;
+  const centerX = (x0+x1)/2;
+  const topH = Math.min(110, h*0.46);
+
+  lctx.font="11px sans-serif"; lctx.textBaseline="middle";
+  const levelY = {};
+  levels.forEach((m,i)=>{
+    const y = 14 + (n<=1?0:i*(topH-24)/(n-1));
+    levelY[m.toFixed(1)] = y;
+    const isCentral = Math.abs(m-0.5)<1e-6 || Math.abs(m+0.5)<1e-6;
+    lctx.strokeStyle = isCentral ? COL.blue : COL.black;
+    lctx.lineWidth = isCentral ? 2.6 : 1.3;
+    lctx.beginPath(); lctx.moveTo(x0,y); lctx.lineTo(x1,y); lctx.stroke();
+    lctx.fillStyle = isCentral ? COL.blue : COL.dgrey;
+    const label = "m = " + (m>0?"+":"") + (Number.isInteger(m)?m:Math.round(m*2)+"/2");
+    lctx.fillText(label, x1+8, y);
+  });
+  lctx.fillStyle=COL.dgrey; lctx.font="italic 10px sans-serif";
+  const nTrans = Math.round(2*I);
+  lctx.fillText(nTrans+" single-quantum transition"+(nTrans>1?"s":"")+
+    (quad ? " — grey: satellite powder pattern (η=0, first-order only); orange: pulse excitation profile" :
+            (I>0.5 ? " (integer spin: no distinguished central transition; grey shows the simulated offset distribution)"
+                   : " — grey: simulated offset distribution; orange: pulse excitation profile")),
+    x0, 10);
+
+  // ---- frequency axis section: static pattern, resonance, pulse excitation profile ----
+  // Shown for every nucleus now: quadrupolar half-integer spins get the real
+  // multi-transition satellite powder pattern; everything else gets the same
+  // Gaussian that actually drives its isochromat ensemble (computeGenericPattern),
+  // so this is never just a placeholder -- it's always tied to real simulated physics.
+  const sat = quad ? computeSatellitePattern() : computeGenericPattern();
+  const bottomY0 = topH+16, bottomY1 = h-22;
+  const rangeKHz = Math.max((sat.maxAbsShiftKHz||0)*1.3, nu1kHz*4, 5);
+  function fx(freqKHz){ return centerX + freqKHz/rangeKHz*((x1-x0)/2); }
+
+  // guide lines: CT (or the sole transition, for spin<=1/2) straight down; outermost
+  // satellite pair fanning to the edges (quadrupolar, more than 2 levels, only)
+  lctx.setLineDash([3,2]); lctx.lineWidth=1; lctx.strokeStyle=COL.blue;
+  const ctY = (levelY["0.5"]+levelY["-0.5"])/2;
+  lctx.beginPath(); lctx.moveTo(centerX,ctY); lctx.lineTo(centerX,bottomY0); lctx.stroke();
+  if(quad && levels.length>2){
+    const outerMidY = (levelY[I.toFixed(1)] + levelY[(I-1).toFixed(1)])/2;
+    lctx.strokeStyle=COL.dgrey; lctx.setLineDash([2,3]); lctx.lineWidth=0.8;
+    lctx.beginPath(); lctx.moveTo(centerX,outerMidY); lctx.lineTo(fx(rangeKHz*0.95),bottomY0); lctx.stroke();
+    lctx.beginPath(); lctx.moveTo(centerX,outerMidY); lctx.lineTo(fx(-rangeKHz*0.95),bottomY0); lctx.stroke();
+  }
+  lctx.setLineDash([]);
+
+  lctx.strokeStyle=COL.black; lctx.lineWidth=1.2;
+  lctx.beginPath(); lctx.moveTo(x0,bottomY1); lctx.lineTo(x1,bottomY1); lctx.stroke();
+  lctx.fillStyle=COL.dgrey; lctx.font="10px sans-serif";
+  lctx.fillText("-"+rangeKHz.toFixed(0)+" kHz", x0, bottomY1+12);
+  lctx.fillText("0", centerX-3, bottomY1+12);
+  lctx.fillText("+"+rangeKHz.toFixed(0)+" kHz", x1-46, bottomY1+12);
+
+  const plotH = bottomY1-bottomY0-4;
+  if(sat.bins){
+    if(masRateKHz>0){
+      const sidebands = sidebandsFromPattern(sat.bins, sat.maxAbsShiftKHz, masRateKHz);
+      lctx.strokeStyle=COL.grey; lctx.fillStyle="rgba(154,154,154,0.55)";
+      // Draw every sideband, *including* the centreband (k=0): when the MAS rate is
+      // large compared to the static pattern's width (the common case for a narrow
+      // spin-1/2 line, or fast MAS on a weakly-quadrupolar one), essentially all the
+      // weight collapses into the centreband -- skipping it here used to mean nothing
+      // was drawn at all in that regime, looking like sidebands weren't computed.
+      // The solid blue resonance line is drawn on top afterwards regardless, so the
+      // exact centre frequency stays distinguishable from the grey centreband bar.
+      for(const sb of sidebands){
+        const xx=fx(sb.freqKHz), yy=bottomY1-sb.weight*plotH;
+        lctx.fillRect(xx-1.5, yy, 3, bottomY1-yy);
+      }
+    } else {
+      const nb=sat.bins.length;
+      lctx.fillStyle="rgba(154,154,154,0.45)";
+      lctx.beginPath(); lctx.moveTo(fx(-sat.maxAbsShiftKHz), bottomY1);
+      for(let i=0;i<nb;i++){
+        const freqKHz = -sat.maxAbsShiftKHz + i/(nb-1)*2*sat.maxAbsShiftKHz;
+        lctx.lineTo(fx(freqKHz), bottomY1-sat.bins[i]*plotH);
+      }
+      lctx.lineTo(fx(sat.maxAbsShiftKHz), bottomY1); lctx.closePath(); lctx.fill();
+    }
+  }
+
+  lctx.strokeStyle=COL.blue; lctx.lineWidth=2.4;
+  lctx.beginPath(); lctx.moveTo(centerX,bottomY1); lctx.lineTo(centerX,bottomY0+4); lctx.stroke();
+
+  const prof = computeExcitationProfile();
+  if(prof.points && prof.points.length){
+    lctx.strokeStyle=COL.orange; lctx.lineWidth=1.6;
+    lctx.beginPath();
+    prof.points.forEach((p,i)=>{
+      const xx=fx(p.freqKHz), yy=bottomY1-p.eff*plotH;
+      if(i===0) lctx.moveTo(xx,yy); else lctx.lineTo(xx,yy);
+    });
+    lctx.stroke();
+  }
+
+  lctx.font="italic 10.5px sans-serif";
+  if(quad){
+    const enh = ctSelectiveEnhancement();
+    lctx.fillStyle = enh>1 ? COL.blue : COL.orange;
+    const regimeText = enh>1
+      ? "CT-selective excitation (nutation enhanced ×"+enh.toFixed(1)+")"
+      : "non-selective excitation (satellites also within pulse bandwidth)";
+    lctx.fillText(regimeText, x0, bottomY0-3);
+  } else {
+    lctx.fillStyle=COL.orange;
+    lctx.fillText("pulse excitation profile vs. the simulated offset distribution", x0, bottomY0-3);
+  }
+  if(masRateKHz>0){
+    lctx.fillStyle=COL.dgrey;
+    lctx.fillText("MAS "+masRateKHz.toFixed(1)+" kHz: static pattern rebinned into spinning sidebands", x0+(quad?330:300), bottomY0-3);
+  }
+}
+
+// ---------------- rendering: time traces ----------------
+const traceCanvas = document.getElementById("traceCanvas");
+const tctx = traceCanvas.getContext("2d");
+let traceBuf = [];
+function drawTracePanel(){
+  const w=traceCanvas.width, h=traceCanvas.height;
+  tctx.clearRect(0,0,w,h);
+  const padL=42, padR=10, padT=14, padB=26;
+  const plotW=w-padL-padR, plotH=h-padT-padB;
+  tctx.strokeStyle=COL.black; tctx.lineWidth=1.3;
+  tctx.beginPath(); tctx.moveTo(padL,padT); tctx.lineTo(padL,h-padB); tctx.lineTo(w-padR,h-padB); tctx.stroke();
+  tctx.fillStyle=COL.black; tctx.font="11px sans-serif";
+  tctx.fillText("time", w-padR-26, h-padB+16);
+  tctx.save(); tctx.translate(12,padT+10); tctx.fillText("M",0,0); tctx.restore();
+
+  if(traceBuf.length<2) return;
+  const t0 = traceBuf[0].t, t1_ = traceBuf[traceBuf.length-1].t;
+  const span = Math.max(t1_-t0, 1);
+  function X(tt){ return padL + (tt-t0)/span*plotW; }
+  function Y(v){ return h-padB - (v+1)/2*plotH; }
+
+  const T2s = currentT2Star();
+  tctx.strokeStyle=COL.dgrey; tctx.setLineDash([5,3]); tctx.lineWidth=1;
+  tctx.beginPath();
+  for(let i=0;i<traceBuf.length;i++){
+    const dt = traceBuf[i].t - traceBuf[0].t;
+    const env = Math.exp(-dt/T2s);
+    const x=X(traceBuf[i].t), y=Y(env);
+    if(i===0) tctx.moveTo(x,y); else tctx.lineTo(x,y);
+  }
+  tctx.stroke(); tctx.setLineDash([]);
+
+  tctx.strokeStyle=COL.black; tctx.lineWidth=2;
+  tctx.beginPath();
+  traceBuf.forEach((p,i)=>{ const x=X(p.t),y=Y(p.mz); if(i===0) tctx.moveTo(x,y); else tctx.lineTo(x,y); });
+  tctx.stroke();
+
+  tctx.strokeStyle=COL.blue; tctx.lineWidth=2.6;
+  tctx.beginPath();
+  traceBuf.forEach((p,i)=>{ const x=X(p.t),y=Y(p.mxy); if(i===0) tctx.moveTo(x,y); else tctx.lineTo(x,y); });
+  tctx.stroke();
+
+  tctx.fillStyle=COL.black; tctx.font="bold 11px sans-serif"; tctx.fillText("ΣMz", padL+6, padT+12);
+  tctx.fillStyle=COL.blue; tctx.fillText("|ΣMxy|", padL+6, padT+26);
+}
+
+// ---------------- rendering: spectrum ----------------
+const specCanvas = document.getElementById("specCanvas");
+const sctx = specCanvas.getContext("2d");
+function drawSpecPanel(){
+  const w=specCanvas.width, h=specCanvas.height;
+  sctx.clearRect(0,0,w,h);
+  const padL=14, padR=14, padT=16, padB=30;
+  const plotW=w-padL-padR, plotH=h-padT-padB;
+  sctx.strokeStyle=COL.black; sctx.lineWidth=1.3;
+  sctx.beginPath(); sctx.moveTo(w-padR,h-padB); sctx.lineTo(padL,h-padB); sctx.stroke();
+  sctx.fillStyle=COL.black; sctx.font="11px sans-serif";
+  sctx.fillText("frequency (Hz, offset from carrier)", padL, h-padB+16);
+
+  const n = FFT_N;
+  const re=new Float64Array(n), im=new Float64Array(n);
+  for(let i=0;i<fidBuffer.length;i++){ re[n-fidBuffer.length+i]=fidBuffer[i].re; im[n-fidBuffer.length+i]=fidBuffer[i].im; }
+  // Hann window on the filled portion to tame FFT leakage
+  const filled = fidBuffer.length;
+  for(let i=0;i<filled;i++){
+    const wgt = 0.5-0.5*Math.cos(2*Math.PI*i/Math.max(filled-1,1));
+    const idx = n-filled+i;
+    re[idx]*=wgt; im[idx]*=wgt;
+  }
+  fft(re,im);
+  const mag = new Float64Array(n);
+  let maxMag=1e-9;
+  for(let i=0;i<n;i++){ mag[i]=Math.hypot(re[i],im[i]); if(mag[i]>maxMag) maxMag=mag[i]; }
+  // reorder so 0 frequency is centered
+  const half=n/2;
+  function shifted(i){ return mag[(i+half)%n]; }
+
+  sctx.strokeStyle=COL.blue; sctx.fillStyle="rgba(0,114,178,0.18)"; sctx.lineWidth=2;
+  sctx.beginPath();
+  sctx.moveTo(padL, h-padB);
+  for(let i=0;i<n;i++){
+    const x = padL + i/(n-1)*plotW;
+    const y = h-padB - shifted(i)/maxMag*plotH;
+    sctx.lineTo(x,y);
+  }
+  sctx.lineTo(w-padR,h-padB); sctx.closePath(); sctx.fill();
+  sctx.beginPath();
+  for(let i=0;i<n;i++){
+    const x = padL + i/(n-1)*plotW;
+    const y = h-padB - shifted(i)/maxMag*plotH;
+    if(i===0) sctx.moveTo(x,y); else sctx.lineTo(x,y);
+  }
+  sctx.stroke();
+
+  // FWHM
+  let peakI=half, peakV=-1;
+  for(let i=0;i<n;i++){ const v=shifted(i); if(v>peakV){peakV=v;peakI=i;} }
+  let li=peakI, ri=peakI;
+  while(li>0 && shifted(li)>peakV/2) li--;
+  while(ri<n-1 && shifted(ri)>peakV/2) ri++;
+  const dfHz = 1000/(SAMPLE_DT*n); // Hz per FFT bin, given SAMPLE_DT in ms
+  const fwhmBins = (ri-li);
+  const fwhmHz = fwhmBins*dfHz;
+  const haveSignal = lastPulse90Time!==null && filled>8;
+  document.getElementById("rFwhm").textContent = haveSignal ? fwhmHz.toFixed(1)+" Hz" : "-";
+  const dnuHz = 1000/(Math.PI*currentT2Star());
+  document.getElementById("rDnu").textContent = dnuHz.toFixed(1)+" Hz";
+
+  const fmax = dfHz*half;
+  sctx.fillStyle=COL.dgrey; sctx.font="10px sans-serif";
+  sctx.fillText("-"+fmax.toFixed(0)+" Hz", padL, h-padB+16+12);
+  sctx.fillText("0", padL+plotW/2-3, h-padB+16+12);
+  sctx.fillText("+"+fmax.toFixed(0)+" Hz", w-padR-46, h-padB+16+12);
+}
+
+// ---------------- UI wiring ----------------
+const t1Slider=document.getElementById("t1"), t2Slider=document.getElementById("t2"), speedSlider=document.getElementById("speed");
+const nucSelect=document.getElementById("nucleus"), b0Slider=document.getElementById("b0"),
+      cqSlider=document.getElementById("cq"), cqField=document.getElementById("cqField"),
+      ppmSlider=document.getElementById("ppm"), masSlider=document.getElementById("mas"),
+      dfsDurField=document.getElementById("dfsDurField"), dfsDurSlider=document.getElementById("dfsDur"),
+      btnDFS=document.getElementById("btnDFS");
+
+Object.keys(NUCLEI).forEach(k=>{
+  const opt=document.createElement("option");
+  opt.value=k; opt.textContent=formatNucleus(k)+"  (I="+fmtSpin(NUCLEI[k].I)+")";
+  nucSelect.appendChild(opt);
+});
+nucSelect.value = nucleusKey;
+cqField.style.display = isHalfIntQuad(NUCLEI[nucleusKey].I) ? "" : "none";
+dfsDurField.style.display = isHalfIntQuad(NUCLEI[nucleusKey].I) ? "" : "none";
+btnDFS.style.display = isHalfIntQuad(NUCLEI[nucleusKey].I) ? "" : "none";
+function t1FromSlider(v){ // log scale 1..5000 ms
+  const lo=Math.log(1), hi=Math.log(5000);
+  return Math.exp(lo+(hi-lo)*(v/1000));
+}
+function t1ToSliderVal(ms){ const lo=Math.log(1), hi=Math.log(5000); return (Math.log(ms)-lo)/(hi-lo)*1000; }
+function t2FromSlider(v){ const lo=Math.log(0.1), hi=Math.log(1000); return Math.exp(lo+(hi-lo)*(v/1000)); }
+function t2FromVal(ms){ const lo=Math.log(0.1), hi=Math.log(1000); return (Math.log(ms)-lo)/(hi-lo)*1000; }
+
+function refreshReadouts(){
+  document.getElementById("t1val").textContent = T1.toFixed(0);
+  document.getElementById("t2val").textContent = T2.toFixed(1);
+  document.getElementById("spval").textContent = speedMult.toFixed(2);
+  document.getElementById("nu1val").textContent = nu1kHz;
+  document.getElementById("nShownVal").textContent = document.getElementById("nShown").value;
+  document.getElementById("b0val").textContent = B0.toFixed(1);
+  document.getElementById("cqval").textContent = cqMHz.toFixed(1);
+  document.getElementById("ppmval").textContent = linewidthPpm===0 ? "0" : linewidthPpm.toPrecision(2);
+  document.getElementById("masval").textContent = masRateKHz.toFixed(1);
+  document.getElementById("dfsDurVal").textContent = dfsDurationMs.toFixed(1);
+  document.getElementById("rT").textContent = t.toFixed(0);
+  document.getElementById("rT2s").textContent = currentT2Star().toFixed(1);
+  const fit = fitT2Star();
+  document.getElementById("rT2fit").textContent = fit ? fit.toFixed(1) : "-";
+  const s = sumM();
+  document.getElementById("rMz").textContent = s.sz.toFixed(3);
+  document.getElementById("rMxy").textContent = Math.hypot(s.sx,s.sy).toFixed(3);
+
+  const nuc = NUCLEI[nucleusKey];
+  const nu0MHz = nu0Hz()/1e6;
+  let html = "&nu;0 = <b>"+nu0MHz.toFixed(2)+" MHz</b> &nbsp; spin I = <b>"+fmtSpin(nuc.I)+"</b>"+
+    " &nbsp; natural abundance <b>"+nuc.abund+"%</b>";
+  if(nuc.gamma<0) html += " &nbsp; &gamma;&lt;0 (moment antiparallel to spin)";
+  if(isHalfIntQuad(nuc.I)) html += " &nbsp; effective linewidth incl. Cq: <b>"+effectivePpm().toPrecision(2)+" ppm</b>";
+  document.getElementById("physReadout").innerHTML = html;
+}
+
+t1Slider.addEventListener("input", ()=>{ T1=t1FromSlider(+t1Slider.value); clampT2(); refreshReadouts(); });
+t2Slider.addEventListener("input", ()=>{ T2=t2FromSlider(+t2Slider.value); clampT2(); refreshReadouts(); });
+speedSlider.addEventListener("input", ()=>{
+  const v=+speedSlider.value; // -200..100
+  speedMult = v>=0 ? 1+v/100*9 : Math.pow(10, v/100*2); // negative -> very slow (down to 0.01x)
+  refreshReadouts();
+});
+nucSelect.addEventListener("change", ()=>{
+  nucleusKey = nucSelect.value;
+  const nuc = NUCLEI[nucleusKey];
+  const quad = isHalfIntQuad(nuc.I);
+  cqField.style.display = quad ? "" : "none";
+  dfsDurField.style.display = quad ? "" : "none";
+  btnDFS.style.display = quad ? "" : "none";
+  if(!quad){ cqMHz=0; cqSlider.value=0; }
+  else if(cqMHz===0){ cqMHz=2.0; cqSlider.value=20; }
+  resetIsochromats(); refreshReadouts(); drawLevels();
+});
+b0Slider.addEventListener("input", ()=>{ B0=(+b0Slider.value)/10; resetIsochromats(); refreshReadouts(); drawLevels(); });
+cqSlider.addEventListener("input", ()=>{ cqMHz=(+cqSlider.value)/10; resetIsochromats(); refreshReadouts(); drawLevels(); });
+ppmSlider.addEventListener("input", ()=>{ linewidthPpm=ppmFromSlider(+ppmSlider.value); resetIsochromats(); refreshReadouts(); drawLevels(); });
+masSlider.addEventListener("input", ()=>{ masRateKHz=(+masSlider.value)/10; updateSampleDT(); refreshReadouts(); drawLevels(); });
+document.getElementById("nShown").addEventListener("input", refreshReadouts);
+dfsDurSlider.addEventListener("input", ()=>{ dfsDurationMs=+dfsDurSlider.value; refreshReadouts(); });
+const captionLine = document.getElementById("captionLine");
+function safe(fn){
+  return (...args)=>{
+    try{ fn(...args); }
+    catch(e){ captionLine.textContent = "Internal error: " + e.message; }
+  };
+}
+
+btnDFS.onclick=safe(()=>startDFS());
+
+document.getElementById("btn90").onclick=safe(()=>startPulse(90,"x"));
+document.getElementById("btn180x").onclick=safe(()=>startPulse(180,"x"));
+document.getElementById("btn180y").onclick=safe(()=>startPulse(180,"y"));
+document.getElementById("btnReset").onclick=safe(()=>{ resetIsochromats(); });
+document.getElementById("btnStep").onclick=safe(()=>{ if(!playing) stepPhysics(2); });
+const btnPlay=document.getElementById("btnPlay");
+btnPlay.onclick=safe(()=>{ playing=!playing; btnPlay.textContent = playing?"pause":"play"; });
+
+document.getElementById("pFID").onclick=safe(()=>{
+  resetIsochromats(); startPulse(90,"x");
+  captionLine.textContent = "Free induction decay: 90°x pulse, then watch ΣMxy decay at T2* while T2 (per isochromat) decays slower.";
+});
+document.getElementById("pEcho").onclick=safe(()=>{
+  resetIsochromats(); startPulse(90,"x");
+  const tau=Math.max(60, 1.2*currentT2Star());
+  scheduleAt(tau, safe(()=>{ startPulse(180,"y"); captionLine.textContent="180°y refocusing pulse applied — watch the fan re-converge."; }));
+  scheduleAt(2*tau, safe(()=>{ captionLine.textContent="Echo maximum at 2τ — it sits on the exp(−2τ/T2) curve, not the T2* curve: T2* dephasing is reversible, T2 relaxation is not."; }));
+  captionLine.textContent = "Hahn echo: 90°x, wait τ, 180°y, wait τ, echo forms.";
+});
+document.getElementById("pIR").onclick=safe(()=>{
+  resetIsochromats(); startPulse(180,"x");
+  const tau = 0.7*T1;
+  scheduleAt(tau, safe(()=>{ startPulse(90,"x"); captionLine.textContent="90°x read pulse applied at τ after inversion — the null point is at τ = T1·ln2."; }));
+  captionLine.textContent = "Inversion recovery: 180°x, wait τ, 90°x read.";
+});
+document.getElementById("pCPMG").onclick=safe(()=>{
+  resetIsochromats(); startPulse(90,"x");
+  const spacing = Math.max(40, 1.0*currentT2Star());
+  for(let k=1;k<=6;k++){
+    scheduleAt(k*spacing, safe(()=>{ startPulse(180,"y"); }));
+  }
+  captionLine.textContent = "CPMG: 90°x then a train of 180°y pulses — the echo train envelope decays at T2, not T2*.";
+});
+
+const nu1Slider=document.getElementById("nu1"), shapeSelect=document.getElementById("pulseShape");
+nu1Slider.addEventListener("input", ()=>{ nu1kHz=+nu1Slider.value; refreshReadouts(); drawLevels(); });
+shapeSelect.addEventListener("change", ()=>{ pulseShapeKind=shapeSelect.value; drawLevels(); });
+
+// ---------------- main loop ----------------
+let lastTime = null, lastDt = 2;
+function frame(now){
+  try{
+    frameInner(now);
+  }catch(e){
+    // A thrown error here would otherwise never call requestAnimationFrame again,
+    // silently freezing the whole app with no visible sign anything went wrong.
+    // Surface it on-page (no devtools needed) and keep the loop alive so the rest
+    // of the UI (sliders, nucleus choice) stays responsive even if one subsystem broke.
+    captionLine.textContent = "Internal error (animation paused this frame): " + e.message;
+    pulseAnim = null; // drop whatever pulse state may have caused it, so retrying isn't stuck
+  }
+  requestAnimationFrame(frame);
+}
+
+function frameInner(now){
+  if(lastTime===null) lastTime=now;
+  const realDt = Math.min(now-lastTime, 50);
+  lastTime = now;
+
+  if(pulseAnim){
+    // Clamp defensively: rAF timestamps and performance.now() at click-time can
+    // occasionally be out of order by a hair across browsers/tasks, which would
+    // otherwise produce a negative index into the trajectory and throw here --
+    // silently freezing the whole animation loop (no more frames ever scheduled).
+    const elapsed = Math.max(0, now - pulseAnim.startPerf);
+    const frac = Math.min(1, elapsed/pulseAnim.wallMs);
+    const idx = Math.max(0, Math.min(pulseAnim.trajectory.length-1, Math.floor(frac*(pulseAnim.trajectory.length-1))));
+    const snap = pulseAnim.trajectory[idx];
+    for(let i=0;i<N;i++){ iso[i].mx=snap[i].mx; iso[i].my=snap[i].my; iso[i].mz=snap[i].mz; }
+    if(frac>=1) finishPulse();
+  } else if(playing){
+    const totalSimDt = Math.min(Math.max(realDt*speedMult,0.0005), 40);
+    // Substep so fast dynamics (short T2*, or fast MAS modulation) still animate
+    // smoothly instead of jumping within a single rendered frame: cap step size at
+    // 2ms for normal (slow) regimes, but shrink it well below T2* -- and below the
+    // MAS rotor period, when spinning -- when those are short.
+    // 4 samples/rotor-period is coarser than the 8 used previously, but this is a
+    // qualitative-narrowing demo, not a research-grade integrator, and halving the
+    // substep count roughly halves the per-frame cost at high MAS rates.
+    const masCap = masRateKHz>0 ? 1/(masRateKHz*4) : Infinity; // ms, resolves the rotor period
+    const subDt = Math.min(totalSimDt, 2, masCap, Math.max(currentT2Star()/8, 0.0005));
+    let remaining = totalSimDt, guard = 0;
+    while(remaining > 1e-9 && guard < 600){
+      const dt = Math.min(subDt, remaining);
+      lastDt = dt;
+      stepPhysics(dt);
+      remaining -= dt;
+      guard++;
+    }
+    labPhase += 0.35*(realDt/16.7);
+  }
+  drawVectorPanel();
+  drawTracePanel();
+  drawSpecPanel();
+  // drawLevels() is intentionally NOT called every frame: it depends only on
+  // nucleus/B0/Cq/linewidth/nu1/pulse-shape/MAS-rate, never on the live iso[]/t
+  // state, so it's called explicitly from those controls' own event handlers
+  // instead of redrawing ~1000 static canvas primitives 60 times a second.
+  refreshReadouts();
+}
+
+T1 = t1FromSlider(+t1Slider.value);
+T2 = t2FromSlider(+t2Slider.value);
+clampT2();
+resetIsochromats();
+drawLevels();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

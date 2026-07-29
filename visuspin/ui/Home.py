@@ -43,11 +43,18 @@ lesson_link("9", "HMQC", "Turning 'these nuclei are coupled' into a 2D map of ex
 lesson_link("10", "Pulse Sequence Composer", "Capstone: build Hahn echo, CPMG, REDOR, CP and more from the same handful of primitives.", "pages/10_Pulse_Sequence_Composer.py")
 
 st.divider()
+st.subheader("Companion tool")
+lesson_link("Live", "Live Vector Explorer", "A real-time, 60fps animated companion to Lesson 1 — same physics, no clicking to recompute. "
+             "Also runs standalone with no Python at all: double-click run_visuspin_live.bat.", "pages/11_Live_Vector_Explorer.py")
+
+st.divider()
 st.markdown(
     """
 **How to run this app.** If you installed VisuSpin with the provided
-`scripts/install.ps1`, use the `run_visuspin.bat` shortcut it created. To run
-manually: `streamlit run visuspin/ui/Home.py` from the project root.
+`scripts/install.ps1`, use the `run_visuspin.bat` shortcut it created (or
+`run_visuspin_live.bat` to jump straight to the standalone Live Vector
+Explorer, no Streamlit required). To run manually:
+`streamlit run visuspin/ui/Home.py` from the project root.
 
 **Scope note.** VisuSpin is a *teaching* tool. Simple interactions (Bloch
 relaxation, CSA, dipolar couplings, static 2nd-order quadrupolar lineshapes)

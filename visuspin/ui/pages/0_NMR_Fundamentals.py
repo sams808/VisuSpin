@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 
-from common import page_header, lesson_header, key_takeaway, term, predict_then_reveal, next_lesson
+from common import page_header, lesson_header, key_takeaway, term, predict_then_reveal, next_lesson, animated_plot
 from visuspin.physics.nuclides import NUCLIDES, nu0_hz
 from visuspin.physics import bloch
 
@@ -74,19 +74,19 @@ with col1:
     t_snap = st.slider("Time (arbitrary units — watch M sweep around)", 0.0, 1.0, 0.0, 0.02)
 
 with col2:
-    ens = bloch.Ensemble.from_gaussian_offsets(1, 0.0, seed=1)
-    bloch.apply_pulse(ens, 90, 0.0, 500, "hard")
-    demo_omega = 2 * np.pi * 3  # 3 full turns over the slider's [0,1] range, purely illustrative
-    theta = demo_omega * t_snap
-    mx, my, mz = np.cos(theta), -np.sin(theta), 0.0
-    fig1, ax1 = plt.subplots(figsize=(4, 4), subplot_kw={"projection": "3d"})
-    ax1.plot([0, 0], [0, 0], [-1, 1], color="lightgray", linestyle="--", linewidth=1)
-    u, v = np.linspace(0, 2 * np.pi, 40), 0
-    ax1.plot(np.cos(u), np.sin(u), np.zeros_like(u), color="lightgray", linewidth=0.6)
-    ax1.plot([0, mx], [0, my], [0, mz], color="#5b46e5", linewidth=3.5)
-    ax1.set_xlim(-1, 1); ax1.set_ylim(-1, 1); ax1.set_zlim(-1, 1)
-    ax1.set_title(f"M precessing in the transverse plane\n(illustrative rate, not {nu0/1e6:.0f} MHz — that's far too fast to animate with a slider!)", fontsize=8)
-    st.pyplot(fig1); plt.close(fig1)
+    def _build_precession_fig(t):
+        demo_omega = 2 * np.pi * 3  # 3 full turns over [0,1], purely illustrative
+        theta = demo_omega * t
+        mx, my, mz = np.cos(theta), -np.sin(theta), 0.0
+        fig1, ax1 = plt.subplots(figsize=(4, 4), subplot_kw={"projection": "3d"})
+        ax1.plot([0, 0], [0, 0], [-1, 1], color="lightgray", linestyle="--", linewidth=1)
+        u = np.linspace(0, 2 * np.pi, 40)
+        ax1.plot(np.cos(u), np.sin(u), np.zeros_like(u), color="lightgray", linewidth=0.6)
+        ax1.plot([0, mx], [0, my], [0, mz], color="#5b46e5", linewidth=3.5)
+        ax1.set_xlim(-1, 1); ax1.set_ylim(-1, 1); ax1.set_zlim(-1, 1)
+        ax1.set_title(f"M precessing in the transverse plane\n(illustrative rate, not {nu0/1e6:.0f} MHz — that's far too fast to animate with a slider!)", fontsize=8)
+        return fig1
+    animated_plot("precession_demo", np.linspace(0, 1, 45), _build_precession_fig, t_snap, button_label="▶ Play precession")
 
 with predict_then_reveal("If you double B0, does the precession *rate* double, halve, or stay the same?"):
     nu0_double = nu0_hz(nuc, b0 * 2)

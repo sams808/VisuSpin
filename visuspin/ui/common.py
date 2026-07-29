@@ -3,12 +3,14 @@ from __future__ import annotations
 import sys
 import os
 import base64
+import time
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
 import streamlit as st
+import matplotlib.pyplot as plt
 
 ACCENT = "#5b46e5"
 ASSETS_DIR = os.path.join(_ROOT, "assets")
@@ -115,6 +117,33 @@ def lesson_link(number: str, title: str, description: str, page_path: str) -> No
         st.page_link(page_path, label="Open", icon="➡️")
     except Exception:
         st.caption(f"Open: {page_path}")
+
+
+def animated_plot(key: str, frame_values, build_fig, current_value, button_label: str = "▶ Play", interval_s: float = 0.045) -> None:
+    """A plot normally driven by a slider (`current_value`), with a Play
+    button that steps through `frame_values` automatically -- so seeing the
+    whole trajectory doesn't require manually dragging the slider through
+    every intermediate position. `build_fig(value)` must return a fresh
+    matplotlib Figure for a given value.
+
+    Streamlit has no lightweight native animation primitive (no
+    requestAnimationFrame equivalent): this uses the standard placeholder +
+    time.sleep() loop, which blocks the script for the animation's duration
+    (a few seconds) before returning control -- fine for a short demo, and
+    the reason this is a deliberately separate, opt-in button rather than
+    something that runs automatically on every page load.
+    """
+    placeholder = st.empty()
+    if st.button(button_label, key=f"{key}_play"):
+        for v in frame_values:
+            fig = build_fig(v)
+            placeholder.pyplot(fig)
+            plt.close(fig)
+            time.sleep(interval_s)
+    else:
+        fig = build_fig(current_value)
+        placeholder.pyplot(fig)
+        plt.close(fig)
 
 
 def next_lesson(label: str, page_path: str) -> None:
