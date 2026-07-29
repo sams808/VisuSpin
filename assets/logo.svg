@@ -6,22 +6,22 @@
     </linearGradient>
   </defs>
 
-  <!-- icon: precessing magnetic moment -->
+  <!-- icon: magnetization M precessing about B0, exactly one arrowed
+       vector (M) and one static reference axis (B0, dashed); the
+       precession cone is a plain thin ellipse with no arrowhead, so it
+       reads as a trajectory, not a second field vector. -->
   <g transform="translate(80,80)">
-    <!-- B0 axis -->
+    <!-- B0 axis: static field, dashed reference line only, not a vector -->
     <line x1="0" y1="-62" x2="0" y2="62" stroke="#9aa0b4" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
-    <text x="10" y="-48" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="20" fill="#9aa0b4">B0</text>
+    <text x="10" y="-50" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="19" fill="#9aa0b4">B0</text>
 
-    <!-- precession cone (ellipse) -->
-    <ellipse cx="0" cy="18" rx="54" ry="16" fill="none" stroke="#f0a83c" stroke-width="3"/>
+    <!-- precession cone: the path M sweeps around, not a vector -->
+    <ellipse cx="0" cy="18" rx="54" ry="16" fill="none" stroke="#f0a83c" stroke-width="2.5" stroke-dasharray="1 5"/>
 
-    <!-- precession-motion arc arrow along the cone -->
-    <path d="M -40 8 A 54 16 0 0 1 30 24" fill="none" stroke="#f0a83c" stroke-width="3" stroke-linecap="round"/>
-    <path d="M 30 24 l -9 -5 M 30 24 l -3 -10" fill="none" stroke="#f0a83c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-
-    <!-- magnetic moment vector -->
+    <!-- magnetization vector M, tipped away from B0 -->
     <line x1="0" y1="0" x2="46" y2="-46" stroke="url(#vsArrow)" stroke-width="7" stroke-linecap="round"/>
     <path d="M 46 -46 l -18 3 M 46 -46 l -3 18" fill="none" stroke="url(#vsArrow)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="52" y="-50" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-weight="bold" font-size="22" fill="#5b46e5">M</text>
 
     <!-- origin -->
     <circle cx="0" cy="0" r="4.5" fill="#2a2f45"/>

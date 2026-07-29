@@ -7,10 +7,11 @@
   </defs>
   <rect x="0" y="0" width="160" height="160" rx="28" fill="#f5f4ff"/>
   <g transform="translate(80,86)">
+    <!-- B0: static reference axis, dashed, no arrowhead -->
     <line x1="0" y1="-58" x2="0" y2="58" stroke="#9aa0b4" stroke-width="3.5" stroke-dasharray="2 7" stroke-linecap="round"/>
-    <ellipse cx="0" cy="16" rx="50" ry="15" fill="none" stroke="#f0a83c" stroke-width="4"/>
-    <path d="M -37 7 A 50 15 0 0 1 28 22" fill="none" stroke="#f0a83c" stroke-width="4" stroke-linecap="round"/>
-    <path d="M 28 22 l -8 -5 M 28 22 l -3 -9" fill="none" stroke="#f0a83c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- precession cone: trajectory only, no arrowhead -->
+    <ellipse cx="0" cy="16" rx="50" ry="15" fill="none" stroke="#f0a83c" stroke-width="3" stroke-dasharray="1 6"/>
+    <!-- the one vector in the icon: M -->
     <line x1="0" y1="0" x2="43" y2="-43" stroke="url(#vsArrow)" stroke-width="8.5" stroke-linecap="round"/>
     <path d="M 43 -43 l -17 3 M 43 -43 l -3 17" fill="none" stroke="url(#vsArrow)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="0" cy="0" r="5.5" fill="#2a2f45"/>
