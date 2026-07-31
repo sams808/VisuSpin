@@ -67,6 +67,31 @@ full derivation.
 - Frydman, L. & Harwood, J.S. "Isotropic Spectra of Half-Integer Quadrupolar Spins from Bidimensional Magic-Angle Spinning NMR." *J. Am. Chem. Soc.* **117**, 5367 (1995). (The original MQMAS experiment)
 - Amoureux, J.P., Fernandez, C. & Steuernagel, S. "Z-Filtering in MQMAS NMR." *J. Magn. Reson. A* **123**, 116 (1996). (The shear-ratio formula VisuSpin cites directly, having confirmed by direct computation that a naive rotor-averaged re-derivation from the static formula does *not* reproduce it — see `mqmas.py`'s module docstring and `tests/test_mqmas.py`)
 
+## Disorder & the Czjzek model (`physics/disorder.py`)
+
+- Czjzek, G. et al. "Atomic coordination and the distribution of electric field gradients in amorphous solids." *Phys. Rev. B* **23**, 2513 (1981). (VisuSpin derives the distribution numerically from its defining assumption — random traceless symmetric EFG tensors — rather than quoting the closed-form density; a memorized closed-form marginal was checked against the simulation while building this and found wrong, caught rather than shipped, see `tests/test_disorder.py`.)
+- Le Caër, G., Bureau, B. & Massiot, D. "An extension of the Czjzek model for the distribution of electric field gradients in disordered solids and an application to NMR spectra of ⁷¹Ga in chalcogenide glasses." *J. Phys.: Condens. Matter* **22**, 065402 (2010). (Extended Czjzek model)
+
+## DQ-SQ homonuclear correlation (`physics/dqsq.py`)
+
+- Feike, M. et al. "Broadband Multiple-Quantum NMR Spectroscopy." *J. Magn. Reson. A* **122**, 214 (1996). (BABA recoupling)
+- Hohwy, M. et al. "Broadband dipolar recoupling in the nuclear magnetic resonance of rotating solids: A compensated C7 pulse sequence." *J. Chem. Phys.* **108**, 2686 (1998). (POST-C7 recoupling)
+
+## STMAS (`physics/stmas.py`)
+
+- Gan, Z. "Isotropic NMR spectra of half-integer quadrupolar nuclei using satellite transitions and magic-angle spinning." *J. Am. Chem. Soc.* **122**, 3242 (2000).
+
+## Variable-temperature NMR & exchange dynamics (`physics/dynamics.py`)
+
+- Gutowsky, H.S. & Holm, C.H. "Rate Processes and Nuclear Magnetic Resonance Spectra. II. Hindered Internal Rotation of Amides." *J. Chem. Phys.* **25**, 1228 (1956).
+- McConnell, H.M. "Reaction Rates by Nuclear Magnetic Resonance." *J. Chem. Phys.* **28**, 430 (1958). (VisuSpin simulates 2-site exchange by direct Monte Carlo — stochastic site-jumping under the ordinary Bloch equations — rather than the classical closed-form lineshape, verified against both the slow- and fast-exchange limits.)
+
+## Paramagnetic NMR (`physics/paramagnetic.py`)
+
+- Bertini, I., Luchinat, C. & Parigi, G. *Solution NMR of Paramagnetic Molecules*. Elsevier, 2001.
+- Solomon, I. "Relaxation Processes in a System of Two Spins." *Phys. Rev.* **99**, 559 (1955).
+- Bloembergen, N. "Proton Relaxation Times in Paramagnetic Solutions." *J. Chem. Phys.* **27**, 572 (1957). (Together: the Solomon-Bloembergen theory behind PRE; VisuSpin implements the well-established 1/r⁶ and Curie 1/T scaling laws rather than deriving absolute shifts/rates from hyperfine constants and g-tensors.)
+
 ## Software / testing tools used during development
 
 - Streamlit (`streamlit.io`) — the UI framework VisuSpin is built on.

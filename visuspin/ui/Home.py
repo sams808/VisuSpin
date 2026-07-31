@@ -28,7 +28,7 @@ sidebar as a reference.
 )
 st.divider()
 
-st.subheader("The path")
+st.subheader("Part 1: Foundations")
 
 lesson_link("0", "NMR Fundamentals", "Magnetization, precession, RF pulses, T1/T2, the FID, and the Fourier transform.", "pages/0_NMR_Fundamentals.py")
 lesson_link("1", "Relaxation Explorer", "Why the same sample decays two different ways — T2 vs. T2*, and how an echo tells them apart.", "pages/1_Relaxation_Explorer.py")
@@ -41,6 +41,24 @@ lesson_link("7", "Nutation & CT-Selectivity", "Exciting quadrupolar nuclei effic
 lesson_link("8", "J-Coupling & Decoupling", "The one coupling that doesn't care about orientation — and how to switch it off on purpose.", "pages/8_J_Coupling_Decoupling.py")
 lesson_link("9", "HMQC", "Turning 'these nuclei are coupled' into a 2D map of exactly which atoms are linked to which.", "pages/9_HMQC.py")
 lesson_link("10", "Pulse Sequence Composer", "Capstone: build Hahn echo, CPMG, REDOR, CP and more from the same handful of primitives.", "pages/10_Pulse_Sequence_Composer.py")
+
+st.divider()
+st.subheader("Part 2: Materials Science Applications")
+st.caption("Real disordered materials, quantification, and the techniques that go beyond the Part 1 foundations.")
+
+lesson_link("12", "Disorder & the Czjzek Model", "Why glasses give distributions of Cq/η instead of one crystalline value, and what that does to the lineshape.", "pages/12_Disorder_and_Czjzek_Model.py")
+lesson_link("13", "Real Spectra: Glass Case Studies", "Illustrative 27Al (AlIV/V/VI) and 11B (BO3/BO4, the 'N4' anomaly) worked examples.", "pages/13_Glass_Case_Studies.py")
+lesson_link("14", "Network Connectivity & Qn Speciation", "Why Qn shift trends give populations but not connectivity.", "pages/14_Network_Connectivity.py")
+lesson_link("15", "Quantification Pitfalls", "CP bias, T1 saturation, and spinning-sideband redistribution — three reasons peak height ≠ population.", "pages/15_Quantification_Pitfalls.py")
+lesson_link("16", "DQ-SQ Homonuclear Correlation", "Which sites actually neighbor which — answers Lesson 14's cliffhanger.", "pages/16_DQ_SQ_Correlation.py")
+lesson_link("17", "STMAS vs. MQMAS", "A more sensitive alternative to MQMAS, and why it demands a nearly perfect magic angle.", "pages/17_STMAS.py")
+lesson_link("18", "PASS/TOSS Sideband Separation", "Untangling overlapping sidebands from several sites without spinning faster.", "pages/18_PASS_TOSS.py")
+lesson_link("19", "Variable-Temperature NMR", "Motional narrowing, coalescence, and Arrhenius-activated dynamics/phase transitions.", "pages/19_Variable_Temperature_NMR.py")
+lesson_link("20", "Paramagnetic NMR", "Contact/pseudocontact shifts and PRE — a nuisance from trace dopants, or a deliberate structural probe.", "pages/20_Paramagnetic_NMR.py")
+lesson_link("21", "NMR Crystallography & DFT", "Bridging DFT-computed Cq/η/CSA tensors to the spectra this app simulates.", "pages/21_NMR_Crystallography_DFT.py")
+lesson_link("22", "Choosing Your Experiment", "A question-driven guide to the whole app — pick your goal, get the right lesson.", "pages/22_Choosing_Your_Experiment.py")
+lesson_link("23", "Spectral Fitting Workshop", "Fit a mystery spectrum by hand and see why a good R² alone isn't the whole story.", "pages/23_Spectral_Fitting_Workshop.py")
+lesson_link("24", "Reference & Glossary", "Hz↔ppm converter, typical Cq/η/T1 ranges, and every term defined across the app.", "pages/24_Reference_and_Glossary.py")
 
 st.divider()
 st.subheader("Companion tool")

@@ -70,6 +70,10 @@ with predict_then_reveal("AlV is often the smallest population (a few percent). 
     ax.set_xlabel("Shift (ppm)"); ax.set_ylabel("Intensity"); ax.invert_xaxis()
     ax.set_title(f"Simulated 27Al MAS spectrum: {pop_4}% AlIV / {pop_5}% AlV / {pop_6}% AlVI")
     st.pyplot(fig); plt.close(fig)
+    csv_data = "shift_ppm,intensity\n" + "\n".join(
+        f"{s:.4f},{i:.6f}" for s, i in zip(combined["freq_hz"] / (1e-6 * nu0_al), combined["intensity"])
+    )
+    st.download_button("Download this spectrum as CSV", csv_data, file_name="al27_glass_spectrum.csv", mime="text/csv")
     st.write(
         "Depends entirely on the balance of population **and** linewidth — a small population "
         "with a narrow line can still be clearly visible, while a similarly small population with "

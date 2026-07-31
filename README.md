@@ -6,17 +6,19 @@
 
 ---
 
-VisuSpin is a guided, 11-lesson path through solid-state NMR spin physics,
-built for students with **no prior NMR background**. Every plot is computed
-live from the actual underlying physics — exact per-isochromat Bloch
-integration, first-principles spin-operator diagonalization, or direct
-numerical powder/rotor simulation — from the parameters you choose, not from
-pre-rendered pictures. Each lesson opens with a concrete motivating question,
-builds the idea up one step at a time, and asks you to predict what a plot
-will show *before* revealing it, then hands over the full explorer once the
-concept has landed.
+VisuSpin is a guided, 25-lesson path through solid-state NMR spin physics,
+built for students with **no prior NMR background** and extending into
+real materials-science applications (disordered/glassy materials,
+quantification, dynamics). Every plot is computed live from the actual
+underlying physics — exact per-isochromat Bloch integration, first-
+principles spin-operator diagonalization, direct numerical powder/rotor
+simulation, or direct Monte Carlo (disorder, exchange dynamics) — from the
+parameters you choose, not from pre-rendered pictures. Each lesson opens
+with a concrete motivating question, builds the idea up one step at a time,
+and asks you to predict what a plot will show *before* revealing it, then
+hands over the full explorer once the concept has landed.
 
-## The path
+## Part 1: Foundations
 
 | # | Lesson | What it teaches |
 |---|---|---|
@@ -31,6 +33,24 @@ concept has landed.
 | 8 | **J-Coupling & Decoupling** | The one coupling that doesn't care about orientation — and how to switch it off on purpose |
 | 9 | **HMQC** | Turning "these nuclei are coupled" into a 2D map of exactly which atoms are linked to which |
 | 10 | **Pulse Sequence Composer** | Capstone: build Hahn echo, CPMG, REDOR, CP and more from the same handful of primitives |
+
+## Part 2: Materials Science Applications
+
+| # | Lesson | What it teaches |
+|---|---|---|
+| 12 | **Disorder & the Czjzek Model** | Why glasses give distributions of Cq/η instead of one crystalline value |
+| 13 | **Real Spectra: Glass Case Studies** | Illustrative ²⁷Al (AlIV/V/VI) and ¹¹B (BO₃/BO₄, the "N4" anomaly) worked examples |
+| 14 | **Network Connectivity & Qⁿ Speciation** | Why Qⁿ shift trends give populations but not connectivity |
+| 15 | **Quantification Pitfalls** | CP bias, T1 saturation, and spinning-sideband redistribution |
+| 16 | **DQ-SQ Homonuclear Correlation** | Which sites actually neighbor which — answers Lesson 14's cliffhanger |
+| 17 | **STMAS vs. MQMAS** | A more sensitive MQMAS alternative, and why it demands a near-perfect magic angle |
+| 18 | **PASS/TOSS Sideband Separation** | Untangling overlapping sidebands from several sites without spinning faster |
+| 19 | **Variable-Temperature NMR** | Motional narrowing, coalescence, and Arrhenius-activated dynamics/phase transitions |
+| 20 | **Paramagnetic NMR** | Contact/pseudocontact shifts and PRE — nuisance or deliberate structural probe |
+| 21 | **NMR Crystallography & DFT** | Bridging DFT-computed Cq/η/CSA tensors to the spectra this app simulates |
+| 22 | **Choosing Your Experiment** | A question-driven guide to the whole app |
+| 23 | **Spectral Fitting Workshop** | Fit a mystery spectrum by hand; see why a good R² isn't the whole story |
+| 24 | **Reference & Glossary** | Hz↔ppm converter, typical Cq/η/T1 ranges, every term defined across the app |
 
 Go in order the first time through; after that, jump to any lesson from the
 sidebar as a reference.
@@ -76,11 +96,13 @@ streamlit run visuspin/ui/Home.py
 visuspin/
   physics/      # the actual spin physics — Bloch equations, quadrupolar
                 # perturbation theory, CSA/dipolar/MAS lineshapes, HMQC,
-                # cross-polarization, MQMAS — each independently unit-tested
+                # cross-polarization, MQMAS, Czjzek/extended-Czjzek disorder,
+                # DQ-SQ, STMAS, exchange dynamics, paramagnetic scaling laws
+                # — each independently unit-tested
   sequences/    # block-based pulse-sequence engine (Pulse, Delay, Loop,
                 # SpinLock, Acquire, Recouple, CrossPolarize, DFSSweep) +
                 # named presets + timing-diagram renderer
-  ui/           # Streamlit pages (pages/0_..10_*.py, one per lesson, plus
+  ui/           # Streamlit pages (pages/0_..24_*.py, one per lesson, plus
                 # 11_Live_Vector_Explorer.py) — thin views + narrative over
                 # visuspin.physics/visuspin.sequences, no physics logic of its own
   classic/      # live_vector_explorer.html — standalone real-time JS/canvas
@@ -103,7 +125,16 @@ instead. A few modules intentionally use disclosed simplifications where a
 fully rigorous treatment is out of scope for a teaching tool (e.g. the MQMAS
 shear ratio uses the standard literature closed-form value rather than a
 from-scratch Floquet derivation — see `visuspin/physics/mqmas.py`'s
-docstring for exactly why, verified directly rather than assumed). Every such
+docstring for exactly why, verified directly rather than assumed). The same
+approach carries through Part 2: the Czjzek disorder model is derived
+numerically from its own defining assumption (diagonalizing random EFG
+tensors) rather than a memorized closed-form density — one such memorized
+formula was checked against the simulation while building this and found
+wrong, caught rather than shipped (see `tests/test_disorder.py`). Similarly,
+paramagnetic NMR (Lesson 20) implements the well-established scaling laws
+(Curie 1/T, 1/r⁶ PRE falloff) rather than absolute values from hyperfine
+constants, and PASS/TOSS (Lesson 18) shows the practical before/after
+outcome rather than simulating the pulse-sequence mechanism itself. Every
 simplification is disclosed in the relevant module's docstring and in
 `REFERENCES.md`, rather than silently overclaiming research-grade accuracy.
 
