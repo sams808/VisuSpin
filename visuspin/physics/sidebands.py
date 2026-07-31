@@ -48,14 +48,20 @@ def _biaxial_tensor(delta_aniso: float, eta: float) -> np.ndarray:
 
 def mas_sideband_spectrum(delta_aniso_hz: float, eta: float, nu_rot_hz: float,
                             n_powder: int = 500, n_time_per_period: int = 64,
-                            n_periods: int = 48, t2_star_s: float | None = None) -> dict:
+                            n_periods: int = 48, t2_star_s: float | None = None,
+                            normalize: bool = True) -> dict:
     """Simulated MAS sideband spectrum for a single anisotropic interaction
     (CSA-like: use delta_aniso_hz/eta directly; for a first-order quadrupolar
     satellite transition, pass its own delta_aniso_hz = wq*(m-1/2) and eta=0
     per transition, and sum the resulting spectra).
 
     Returns dict with freq_hz (centred on the isotropic/CT frequency) and
-    intensity (normalised to the centreband = 1 at nu_rot -> infinity limit).
+    intensity (normalised to the centreband = 1 at nu_rot -> infinity limit,
+    unless normalize=False -- pass that when comparing absolute intensities
+    across two different calls with the same n_powder, e.g. to show that
+    equal true populations with different anisotropy give different
+    apparent centreband heights; each call's raw signal is already averaged
+    consistently over n_powder isochromats before this final step).
     """
     if nu_rot_hz <= 0:
         raise ValueError("nu_rot_hz must be > 0; use the static powder pattern for nu_rot=0")
@@ -100,6 +106,6 @@ def mas_sideband_spectrum(delta_aniso_hz: float, eta: float, nu_rot_hz: float,
     spectrum = np.fft.fftshift(np.fft.fft(signal))
     freq = np.fft.fftshift(np.fft.fftfreq(n_total, d=dt))
     mag = np.abs(spectrum)
-    if mag.max() > 0:
+    if normalize and mag.max() > 0:
         mag = mag / mag.max()
     return {"freq_hz": freq, "intensity": mag}

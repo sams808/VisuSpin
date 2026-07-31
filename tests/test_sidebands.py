@@ -39,7 +39,23 @@ def test_sidebands_spaced_at_rotor_rate():
     else:
         print(f"WARN only found {len(peaks)} peaks -- inspect visually")
 
+def test_unnormalized_comparison_shows_centreband_bias():
+    # Same nominal "population" (n_powder, timing all identical) but
+    # different anisotropy: a larger anisotropy spreads more intensity into
+    # sidebands, so its RAW centreband peak is shorter -- the exact effect
+    # Lesson 15 (quantification pitfalls) demonstrates. Only visible with
+    # normalize=False; with normalization on, both would show peak=1.
+    kwargs = dict(eta=0.0, nu_rot_hz=3000, n_powder=300, n_periods=32, n_time_per_period=32)
+    small_aniso = mas_sideband_spectrum(delta_aniso_hz=1000.0, normalize=False, **kwargs)
+    large_aniso = mas_sideband_spectrum(delta_aniso_hz=9000.0, normalize=False, **kwargs)
+    assert small_aniso["intensity"].max() > large_aniso["intensity"].max() * 1.3, \
+        "expected the smaller-anisotropy site's raw centreband to be taller"
+    print(f"PASS unnormalized centreband heights differ for equal 'population' but different "
+          f"anisotropy: small aniso peak={small_aniso['intensity'].max():.3f}, "
+          f"large aniso peak={large_aniso['intensity'].max():.3f}")
+
 if __name__ == "__main__":
     test_fast_spinning_collapses_to_centreband()
     test_sidebands_spaced_at_rotor_rate()
+    test_unnormalized_comparison_shows_centreband_bias()
     print("\nALL SIDEBAND TESTS PASSED (or flagged for visual inspection)")
