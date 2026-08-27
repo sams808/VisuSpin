@@ -71,6 +71,10 @@ if ($CreateShortcut -eq "y" -or $CreateShortcut -eq "Y") {
         $Shortcut = $WshShell.CreateShortcut((Join-Path ([Environment]::GetFolderPath("Desktop")) "VisuSpin.lnk"))
         $Shortcut.TargetPath = $RunBat
         $Shortcut.WorkingDirectory = $RepoRoot
+        $IconPath = Join-Path $RepoRoot "assets\icon.ico"
+        if (Test-Path $IconPath) {
+            $Shortcut.IconLocation = $IconPath
+        }
         $Shortcut.Save()
         Write-Host "Desktop shortcut created." -ForegroundColor Green
     } catch {

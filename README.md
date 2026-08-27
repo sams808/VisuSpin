@@ -110,7 +110,8 @@ visuspin/
 tests/          # one test file per physics module, run directly with
                 # `python tests/test_*.py` (or via pytest)
 scripts/        # install.ps1 / update.ps1 (see above)
-assets/         # logo, icon
+assets/         # logo.svg/icon.svg (source vectors), icon.ico (multi-res
+                # Windows app/shortcut icon), icon.png (512x512, cross-platform)
 run_visuspin.bat        # launches the full Streamlit app
 run_visuspin_live.bat   # launches just the Live Vector Explorer, no Python needed
 ```
