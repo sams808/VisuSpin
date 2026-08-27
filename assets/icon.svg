@@ -1,19 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
   <defs>
-    <linearGradient id="vsArrow" x1="0%" y1="100%" x2="100%" y2="0%">
+    <linearGradient id="vsArrow" x1="10%" y1="90%" x2="90%" y2="10%">
       <stop offset="0%" stop-color="#5b46e5"/>
-      <stop offset="100%" stop-color="#8a7bff"/>
+      <stop offset="100%" stop-color="#9d8dff"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a2360"/>
+      <stop offset="100%" stop-color="#171333"/>
     </linearGradient>
   </defs>
-  <rect x="0" y="0" width="160" height="160" rx="28" fill="#f5f4ff"/>
+  <!-- Contained dark card so the icon reads consistently at any size and
+       against any surrounding page/theme, rather than a bare glyph left to
+       float on whatever background happens to be behind it. Bold solid
+       shapes only (no dashed strokes) so it still holds together when
+       shrunk to a 16px favicon: the precession orbit (ellipse), the
+       magnetization vector M (filled arrowhead, not a sketched two-line
+       barb), and the origin. -->
+  <rect width="160" height="160" rx="34" fill="url(#bgGrad)"/>
   <g transform="translate(80,86)">
-    <!-- B0: static reference axis, dashed, no arrowhead -->
-    <line x1="0" y1="-58" x2="0" y2="58" stroke="#9aa0b4" stroke-width="3.5" stroke-dasharray="2 7" stroke-linecap="round"/>
-    <!-- precession cone: trajectory only, no arrowhead -->
-    <ellipse cx="0" cy="16" rx="50" ry="15" fill="none" stroke="#f0a83c" stroke-width="3" stroke-dasharray="1 6"/>
-    <!-- the one vector in the icon: M -->
-    <line x1="0" y1="0" x2="43" y2="-43" stroke="url(#vsArrow)" stroke-width="8.5" stroke-linecap="round"/>
-    <path d="M 43 -43 l -17 3 M 43 -43 l -3 17" fill="none" stroke="url(#vsArrow)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="0" cy="0" r="5.5" fill="#2a2f45"/>
+    <ellipse cx="0" cy="8" rx="52" ry="19" fill="none" stroke="#f0a83c" stroke-width="6" stroke-linecap="round"/>
+    <line x1="0" y1="4" x2="26.0" y2="-25.1" stroke="url(#vsArrow)" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 36.7 -37.0 L 26.3 -14.1 L 15.1 -24.1 Z" fill="url(#vsArrow)"/>
+    <circle cx="0" cy="4" r="9" fill="#f5f4ff"/>
   </g>
 </svg>

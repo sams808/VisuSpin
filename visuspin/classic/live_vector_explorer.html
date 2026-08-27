@@ -63,18 +63,21 @@
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
     <svg width="46" height="46" viewBox="0 0 160 160" aria-hidden="true">
       <defs>
-        <linearGradient id="vsArrowLive" x1="0%" y1="100%" x2="100%" y2="0%">
+        <linearGradient id="vsArrowLive" x1="10%" y1="90%" x2="90%" y2="10%">
           <stop offset="0%" stop-color="#5b46e5"/>
-          <stop offset="100%" stop-color="#8a7bff"/>
+          <stop offset="100%" stop-color="#9d8dff"/>
+        </linearGradient>
+        <linearGradient id="vsBgLive" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2a2360"/>
+          <stop offset="100%" stop-color="#171333"/>
         </linearGradient>
       </defs>
-      <rect x="0" y="0" width="160" height="160" rx="28" fill="#f5f4ff"/>
+      <rect width="160" height="160" rx="34" fill="url(#vsBgLive)"/>
       <g transform="translate(80,86)">
-        <line x1="0" y1="-58" x2="0" y2="58" stroke="#9aa0b4" stroke-width="3.5" stroke-dasharray="2 7" stroke-linecap="round"/>
-        <ellipse cx="0" cy="16" rx="50" ry="15" fill="none" stroke="#f0a83c" stroke-width="3" stroke-dasharray="1 6"/>
-        <line x1="0" y1="0" x2="43" y2="-43" stroke="url(#vsArrowLive)" stroke-width="8.5" stroke-linecap="round"/>
-        <path d="M 43 -43 l -17 3 M 43 -43 l -3 17" fill="none" stroke="url(#vsArrowLive)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="0" cy="0" r="5.5" fill="#2a2f45"/>
+        <ellipse cx="0" cy="8" rx="52" ry="19" fill="none" stroke="#f0a83c" stroke-width="6" stroke-linecap="round"/>
+        <line x1="0" y1="4" x2="26.0" y2="-25.1" stroke="url(#vsArrowLive)" stroke-width="12" stroke-linecap="round"/>
+        <path d="M 36.7 -37.0 L 26.3 -14.1 L 15.1 -24.1 Z" fill="url(#vsArrowLive)"/>
+        <circle cx="0" cy="4" r="9" fill="#f5f4ff"/>
       </g>
     </svg>
     <div>

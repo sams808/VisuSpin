@@ -1,34 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 160" width="560" height="160">
   <defs>
-    <linearGradient id="vsArrow" x1="0%" y1="100%" x2="100%" y2="0%">
+    <linearGradient id="vsArrow" x1="10%" y1="90%" x2="90%" y2="10%">
       <stop offset="0%" stop-color="#5b46e5"/>
-      <stop offset="100%" stop-color="#8a7bff"/>
+      <stop offset="100%" stop-color="#9d8dff"/>
     </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a2360"/>
+      <stop offset="100%" stop-color="#171333"/>
+    </linearGradient>
+    <style>
+      /* This SVG is embedded via a base64 &lt;img&gt; tag (see common.py's
+         render_logo docstring for why), so it can't see Streamlit's own
+         data-theme attribute -- only the OS/browser-level color-scheme
+         preference. That covers the common "system" case (and GitHub's
+         README dark mode); a user who manually forces Streamlit dark mode
+         against a light OS preference is the one edge case this can't
+         track, a reasonable trade-off over the previous fixed-color text
+         that had no dark-mode handling at all. */
+      .wordmark-dark { fill: #2a2f45; }
+      @media (prefers-color-scheme: dark) {
+        .wordmark-dark { fill: #e8e6f7; }
+      }
+    </style>
   </defs>
 
-  <!-- icon: magnetization M precessing about B0, exactly one arrowed
-       vector (M) and one static reference axis (B0, dashed); the
-       precession cone is a plain thin ellipse with no arrowhead, so it
-       reads as a trajectory, not a second field vector. -->
-  <g transform="translate(80,80)">
-    <!-- B0 axis: static field, dashed reference line only, not a vector -->
-    <line x1="0" y1="-62" x2="0" y2="62" stroke="#9aa0b4" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
-    <text x="10" y="-50" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="19" fill="#9aa0b4">B0</text>
-
-    <!-- precession cone: the path M sweeps around, not a vector -->
-    <ellipse cx="0" cy="18" rx="54" ry="16" fill="none" stroke="#f0a83c" stroke-width="2.5" stroke-dasharray="1 5"/>
-
-    <!-- magnetization vector M, tipped away from B0 -->
-    <line x1="0" y1="0" x2="46" y2="-46" stroke="url(#vsArrow)" stroke-width="7" stroke-linecap="round"/>
-    <path d="M 46 -46 l -18 3 M 46 -46 l -3 18" fill="none" stroke="url(#vsArrow)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="52" y="-50" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-weight="bold" font-size="22" fill="#5b46e5">M</text>
-
-    <!-- origin -->
-    <circle cx="0" cy="0" r="4.5" fill="#2a2f45"/>
+  <!-- icon: contained dark card (never floats directly on the page
+       background), precession orbit + magnetization vector M, matching
+       assets/icon.svg -->
+  <rect x="0" y="0" width="160" height="160" rx="34" fill="url(#bgGrad)"/>
+  <g transform="translate(80,86)">
+    <line x1="0" y1="-58" x2="0" y2="50" stroke="#8f8ab8" stroke-width="3" stroke-linecap="round"/>
+    <text x="9" y="-46" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="18" fill="#c9c5e8">B0</text>
+    <ellipse cx="0" cy="8" rx="52" ry="19" fill="none" stroke="#f0a83c" stroke-width="6" stroke-linecap="round"/>
+    <line x1="0" y1="4" x2="26.0" y2="-25.1" stroke="url(#vsArrow)" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 36.7 -37.0 L 26.3 -14.1 L 15.1 -24.1 Z" fill="url(#vsArrow)"/>
+    <text x="42" y="-38" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-weight="bold" font-size="22" fill="#c3b8ff">M</text>
+    <circle cx="0" cy="4" r="9" fill="#f5f4ff"/>
   </g>
 
   <!-- wordmark -->
   <g transform="translate(168,0)" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="54">
-    <text x="0" y="98" fill="#2a2f45">Visu<tspan fill="#5b46e5">Spin</tspan></text>
+    <text x="0" y="98" class="wordmark-dark">Visu<tspan fill="#8a7bff">Spin</tspan></text>
   </g>
 </svg>
